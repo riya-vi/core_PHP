@@ -15,6 +15,6 @@ if ($connection->connect_error) {
 }
 
 
-echo "connected successfully ";
+// echo "connected successfully ";
 
 ?>

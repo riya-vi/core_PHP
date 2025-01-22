@@ -1,23 +1,6 @@
 <?php
 
-// include './config/dataBaseConnect.php';
-
-$servername = "localhost";
-$username = "root";
-$password = "pHp@1189";
-$databaseName = "my_project";
-
-// Create connection
-$connection = new mysqli($servername, $username , $password ,$databaseName);
-
-// Check connection
-if ($connection->connect_error) {
-  echo " failed to connect ";
-  die("Connection failed: " . $connection->connect_error);
-}
-
-
-echo "connected successfully ";
+include '../config/dataBaseConnect.php';
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -120,76 +103,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // store Json Data
-    // if ($isAnyError == false) {
-    //     $data = array(
-    //         'id' => 0,
-    //         'first name' => $_POST['firstName'],
-    //         'last name' => $_POST['lastName'],
-    //         'email' => $_POST['email'],
-    //         'phone No.' => $_POST['phone'],
-    //         'address' => $_POST['address'],
-    //         'country' => $_POST['country'],
-    //         'state' => $_POST['states'],
-    //         'pincode' => $_POST['pincode'],
-    //         'password' => $_POST['password'],
-    //     );
-
-    //     $jsonFilePath = "user.json";
-
-    //     if (file_exists($jsonFilePath)) {
-
-    //         $fileContent = file_get_contents($jsonFilePath);
-
-    //         if (empty($fileContent)) {
-    //             $existingData = [];
-    //         } else {
-    //             $existingData = json_decode($fileContent, true);
-    //         }
-    //         // print_r($existingData) ;
-
-    //         if (is_array($existingData)) {
-    //             // echo count($existingData);
-    //             if (count($existingData) > 0) {
-    //                 $ids = array_column($existingData, 'id');
-    //                 $data['id'] = max($ids) + 1;
-    //             } else {
-    //                 $data['id'] = 1;
-    //             }
-    //             $existingData[] = $data;
-    //         }
-    //     } else {
-    //         $data['id'] = 1;
-    //         $existingData = array($data);
-    //     }
-
-    //     $jsonData = json_encode($existingData, JSON_PRETTY_PRINT);
-    //     // echo "<br>jsond data";
-    //     // echo $jsonData;
-    //     file_put_contents($jsonFilePath, $jsonData);
-
-
-    //     //output
-    //     echo '<script>alert("Registration done Successfully !")</script>';
-    //     echo '<div class="alert alert-success" role="alert">
-    //         Output :
-    //        </div>';
-    //     echo "First Name: $firstName<br>";
-    //     echo "Last Name: $lastName<br>";
-    //     echo "Email: $email<br>";
-    //     echo "Phone No.: $phone<br>";
-    //     echo "Address: $address<br>";
-    //     echo "Country: $country<br>";
-    //     echo  "State :" . $_POST['states'] . "<br>";
-    //     echo "Pincode: $pincode<br>";
-    //     echo "Password: $password<br>";
-    //     echo "Confirm Password: $confirmPass<br>";
-    // } else {
-    //     echo '<div class="alert alert-danger" role="alert">
-    //          Error saving data !
-    //         </div>';
-    // }
-
     // insert data in database
     if ($isAnyError == false) {
         $firstName = $_POST['firstName'];
@@ -209,8 +122,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$country', '$state' , '$pincode', '$hashedPassword')";
 
         if ($connection->query($sql)) {
-            echo "new record inserted successfully";
+            header("Location: login.php");
+            
         } else {
+            echo "error inserting data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
         }
 
@@ -228,7 +143,6 @@ function test_input($data)
 ?>
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -236,7 +150,7 @@ function test_input($data)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
@@ -342,7 +256,7 @@ function test_input($data)
             </div>
 
             <div class="form_group">
-                <p>already have an account ? <a href="login.php"><span>Login</span></a></p>
+                <p>already have an account ? <a href="/login"><span>Login</span></a></p>
             </div>
         </form>
     </div>
