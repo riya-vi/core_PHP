@@ -1,6 +1,5 @@
 <?php
 include '../config/dataBaseConnect.php';
-include './pagination.php';
 
 session_start();
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
@@ -10,11 +9,43 @@ if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
 }
 
 //pagination
-$paginationData = pagination($connection);
-$result  = $paginationData['result'] ;
-$totalPages = $paginationData['totalPages'];
-$searchResult = $paginationData['search'] ;
-$page = $paginationData['currentPage'] ;
+$recordsPerPage = 5;
+
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$startFrom = ($page - 1) * $recordsPerPage;
+
+
+$sql = "SELECT * FROM `users` LIMIT $startFrom, $recordsPerPage";
+
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $searchResult = $_GET['search'];
+    $sql = "SELECT * FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%' LIMIT $startFrom, $recordsPerPage";
+}
+
+$result = $connection->query($sql);
+
+$countSql = "SELECT COUNT(*) AS total FROM `users`";
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $countSql = "SELECT COUNT(*) AS total FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
+}
+$countResult = $connection->query($countSql);
+$countRow = $countResult->fetch_assoc();
+$totalRecords = $countRow['total'];
+
+$totalPages = ceil($totalRecords / $recordsPerPage);
+
+//sorting 
+// $columns = array('first_name', 'id', 'email', 'last_name');
+
+// $column = isset($_GET['column']) && in_array($_GET['column'], $columns) ? $_GET['column'] : $columns[0];
+
+// $sort_order = isset($_GET['order']) && strtolower($_GET['order']) == 'desc' ? 'DESC' : 'ASC';
+
+
+
+// $up_or_down = str_replace(array('ASC', 'DESC'), array('up', 'down'), $sort_order);
+// $asc_or_desc = $sort_order == 'ASC' ? 'desc' : 'asc';
+// $add_class = ' class="highlight"';
 
 ?>
 
@@ -35,15 +66,23 @@ $page = $paginationData['currentPage'] ;
     <h1>Dashboard</h1>
 
     <!-- Navbar -->
-     <!-- navbar -->
-     <ul>
-        <li> <a href="./home.php">Home</a></li>
-        <li><a href="">about</a></li>
-        <li><a href="">contact</a></li>
-        <li style="float:right"><a href="./logout.php">Logout</a></li>
-     </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-   
+    <a href="./logout.php"><button>Logout</button></a>
 
     <!-- Messages -->
     <div>
@@ -68,16 +107,14 @@ $page = $paginationData['currentPage'] ;
                 <input class="form-control me-2" type="search" placeholder="Search" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
-            
-
-            <a href="./addUser.php"><button  class="btn btn-success">+Add New</button></a>
+            <a href="./addUser.php"><button>+ Add User</button></a>
         </div>
     </nav>
 
 
     <!-- Table -->
-    <div  >
-        <table style="overflow-x: scroll;" >
+    <div class="table-wrapper">
+        <table class="fl-table">
             <thead>
                 <tr>
                     <th> <a href="dashboard.php?column=id&order=<?php echo $asc_or_desc; ?>">Id <i class="fas fa-sort<?php echo $column == 'id' ? '-' . $up_or_down : ''; ?>"></i></a></th>
