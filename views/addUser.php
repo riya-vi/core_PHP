@@ -151,7 +151,8 @@ function test_input($data)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/dashboardStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Add User</title>
@@ -159,105 +160,113 @@ function test_input($data)
 </head>
 
 <body>
+
+<?php
+include './layout/navbar.php' ;
+?>
     <h1>Enter User Details</h1>
 
+    <div class="container">
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 
-        <div class="form_group">
-            <label for="firstName">First name:</label>
-            <input type="text" id="firstName" name="firstName"
-                value="<?= (isset($_POST['firstName'])) ? strip_tags($_POST['firstName']) : '' ?>"> <span class="error">
-                <?php echo $firstNameErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="firstName">First name:</label>
+    <input type="text" id="firstName" name="firstName"
+        value="<?= (isset($_POST['firstName'])) ? strip_tags($_POST['firstName']) : '' ?>"> <span class="error">
+        <?php echo $firstNameErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="lastName">Last name:</label>
-            <input type="text" id="lastName" name="lastName"
-                value="<?= (isset($_POST['lastName'])) ? strip_tags($_POST['lastName']) : '' ?>"><span class="error">
-                <?php echo $lastNameErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="lastName">Last name:</label>
+    <input type="text" id="lastName" name="lastName"
+        value="<?= (isset($_POST['lastName'])) ? strip_tags($_POST['lastName']) : '' ?>"><span class="error">
+        <?php echo $lastNameErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="email">Email :</label>
-            <input type="text" id="email" name="email"
-                value="<?= (isset($_POST['email'])) ? strip_tags($_POST['email']) : '' ?>">
-            <span class="error">
-                <?php echo $emailErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="email">Email :</label>
+    <input type="text" id="email" name="email"
+        value="<?= (isset($_POST['email'])) ? strip_tags($_POST['email']) : '' ?>">
+    <span class="error">
+        <?php echo $emailErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="phone">Phone No. :</label>
-            <input type="text" id="phone" name="phone"
-                value="<?= (isset($_POST['phone'])) ? strip_tags($_POST['phone']) : '' ?>"><span class="error">
-                <?php echo $phoneErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="phone">Phone No. :</label>
+    <input type="text" id="phone" name="phone"
+        value="<?= (isset($_POST['phone'])) ? strip_tags($_POST['phone']) : '' ?>"><span class="error">
+        <?php echo $phoneErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="address">Address :</label>
-            <textarea name="address" id="address" value=""> <?php if (isset($_POST['address'])) {
-                                                                echo $_POST['address'];
-                                                            } ?>
-    </textarea>
-            <span class="error" onchange="" onclick="">
-                <?php echo $addressErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="address">Address :</label>
+    <textarea name="address" id="address" value=""> <?php if (isset($_POST['address'])) {
+                                                        echo $_POST['address'];
+                                                    } ?>
+</textarea>
+    <span class="error" onchange="" onclick="">
+        <?php echo $addressErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="country">Country :</label>
-            <select name="country" id="selectCountry" value="">
-                <option value="">Select Country</option>
-            </select>
-            <span class="error">
-                <?php echo $countryErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="country">Country :</label>
+    <select name="country" id="selectCountry" value="">
+        <option value="">Select Country</option>
+    </select>
+    <span class="error">
+        <?php echo $countryErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="state">State :</label>
-            <select name="states" id="selectStates" value="">
-                <option value="">Select State</option>
-            </select><span class="error">
-                <?php echo $stateErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="state">State :</label>
+    <select name="states" id="selectStates" value="">
+        <option value="">Select State</option>
+    </select><span class="error">
+        <?php echo $stateErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="pincode">Pincode :</label>
-            <input type="text" name="pincode" id="pincode"
-                value="<?= (isset($_POST['pincode'])) ? strip_tags($_POST['pincode']) : '' ?>"><span class="error">
-                <?php echo $pincodeErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="pincode">Pincode :</label>
+    <input type="text" name="pincode" id="pincode"
+        value="<?= (isset($_POST['pincode'])) ? strip_tags($_POST['pincode']) : '' ?>"><span class="error">
+        <?php echo $pincodeErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="password">Password :</label>
-            <input type="password" id="password" name="password"
-                value="<?= (isset($_POST['password'])) ? strip_tags($_POST['password']) : '' ?>"><span
-                class="error">
-                <?php echo $passwordErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="password">Password :</label>
+    <input type="password" id="password" name="password"
+        value="<?= (isset($_POST['password'])) ? strip_tags($_POST['password']) : '' ?>"><span
+        class="error">
+        <?php echo $passwordErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <label for="confirmPass">Confirm Password :</label>
-            <input type="password" id="confirmPass" name="confirmPass"
-                value="<?= (isset($_POST['confirmPass'])) ? strip_tags($_POST['confirmPass']) : '' ?>"><span
-                class="error">
-                <?php echo $confirmPassErr; ?>
-            </span>
-        </div>
+<div class="form_group">
+    <label for="confirmPass">Confirm Password :</label>
+    <input type="password" id="confirmPass" name="confirmPass"
+        value="<?= (isset($_POST['confirmPass'])) ? strip_tags($_POST['confirmPass']) : '' ?>"><span
+        class="error">
+        <?php echo $confirmPassErr; ?>
+    </span>
+</div>
 
-        <div class="form_group">
-            <button type="submit"> Add User</button>
-        </div>
+<div class="form_group">
+    <button type="submit"> Add User</button>
+</div>
 
 
-    </form>
+</form>
+    </div>
+
+
 </body>
 
 </html>

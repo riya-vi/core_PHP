@@ -124,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($connection->query($sql)) {
             session_start();
-            $_SESSION["edit_message"]="Record Updated Successfully !";
+            $_SESSION["edit_message"] = "Record Updated Successfully !";
             header("Location: dashboard.php");
         } else {
             echo "error updating  data .";
@@ -150,7 +150,8 @@ function test_input($data)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/dashboardStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Edit User</title>
@@ -158,7 +159,12 @@ function test_input($data)
 </head>
 
 <body>
-    <a href="./dashboard.php">Dashboard</a>
+
+
+    <?php
+    include './layout/navbar.php';
+    ?>
+
     <h1>Edit User Details</h1>
 
     <?php
@@ -168,89 +174,91 @@ function test_input($data)
         while ($rows = $result->fetch_assoc()) {
     ?>
 
-            <form method="post" action="editUser.php?id=<?php echo $Id; ?>">
-                <div class="form_group">
-                    <label for="firstName">First name:</label>
-                    <input type="text" id="firstName" name="firstName"
-                        value="<?php echo $rows['first_name']; ?>"> <span class="error">
-                        <?php echo $firstNameErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="lastName">Last name:</label>
-                    <input type="text" id="lastName" name="lastName"
-                        value="<?php echo $rows['last_name']; ?>"><span class="error">
-                        <?php echo $lastNameErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="email">Email :</label>
-                    <input type="text" id="email" name="email"
-                        value="<?php echo $rows['email']; ?>">
-                    <span class="error">
-                        <?php echo $emailErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="phone">Phone No. :</label>
-                    <input type="text" id="phone" name="phone"
-                        value="<?php echo $rows['phone_no']; ?>"><span class="error">
-                        <?php echo $phoneErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="address">Address :</label>
-                    <textarea name="address" id="address" value=""><?php echo $rows['address']; ?>
+            <div class="container">
+                <form method="post" action="editUser.php?id=<?php echo $Id; ?>">
+                    <div class="form_group">
+                        <label for="firstName">First name:</label>
+                        <input type="text" id="firstName" name="firstName"
+                            value="<?php echo $rows['first_name']; ?>"> <span class="error">
+                            <?php echo $firstNameErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="lastName">Last name:</label>
+                        <input type="text" id="lastName" name="lastName"
+                            value="<?php echo $rows['last_name']; ?>"><span class="error">
+                            <?php echo $lastNameErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="email">Email :</label>
+                        <input type="text" id="email" name="email"
+                            value="<?php echo $rows['email']; ?>">
+                        <span class="error">
+                            <?php echo $emailErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="phone">Phone No. :</label>
+                        <input type="text" id="phone" name="phone"
+                            value="<?php echo $rows['phone_no']; ?>"><span class="error">
+                            <?php echo $phoneErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="address">Address :</label>
+                        <textarea name="address" id="address" value=""><?php echo $rows['address']; ?>
                     </textarea>
-                    <span class="error" onchange="" onclick="">
-                        <?php echo $addressErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="country">Country :</label>
-                    <select name="country" id="selectCountry" value="">
-                        <option value=""><?php echo $rows['country']; ?></option>
-                    </select>
-                    <span class="error">
-                        <?php echo $countryErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="state">State :</label>
-                    <select name="states" id="selectStates" value="">
-                        <option value=""><?php echo $rows['state']; ?></option>
-                    </select><span class="error">
-                        <?php echo $stateErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="pincode">Pincode :</label>
-                    <input type="text" name="pincode" id="pincode"
-                        value="<?php echo $rows['pincode']; ?>"><span class="error">
-                        <?php echo $pincodeErr; ?>
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="password">Password :</label>
-                    <input type="password" id="password" name="password"
-                        value="<?php echo $rows['password']; ?>"><span
-                        class="error">
+                        <span class="error" onchange="" onclick="">
+                            <?php echo $addressErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="country">Country :</label>
+                        <select name="country" id="selectCountry" value="">
+                            <option value=""><?php echo $rows['country']; ?></option>
+                        </select>
+                        <span class="error">
+                            <?php echo $countryErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="state">State :</label>
+                        <select name="states" id="selectStates" value="">
+                            <option value=""><?php echo $rows['state']; ?></option>
+                        </select><span class="error">
+                            <?php echo $stateErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="pincode">Pincode :</label>
+                        <input type="text" name="pincode" id="pincode"
+                            value="<?php echo $rows['pincode']; ?>"><span class="error">
+                            <?php echo $pincodeErr; ?>
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="password">Password :</label>
+                        <input type="password" id="password" name="password"
+                            value="<?php echo $rows['password']; ?>"><span
+                            class="error">
 
-                    </span>
-                </div>
-                <div class="form_group">
-                    <label for="confirmPass">Confirm Password :</label>
-                    <input type="password" id="confirmPass" name="confirmPass"
-                        value="<?php echo $rows['password']; ?>"><span
-                        class="error">
+                        </span>
+                    </div>
+                    <div class="form_group">
+                        <label for="confirmPass">Confirm Password :</label>
+                        <input type="password" id="confirmPass" name="confirmPass"
+                            value="<?php echo $rows['password']; ?>"><span
+                            class="error">
 
-                    </span>
-                </div>
-                <input type="text" name="id" style="visibility: hidden;" value="<?php echo $id ?>">
-                <div class="form_group">
-                    <button type="submit">Edit User</button>
-                </div>
-            </form>
+                        </span>
+                    </div>
+                    <input type="text" name="id" style="visibility: hidden;" value="<?php echo $id ?>">
+                    <div class="form_group">
+                        <button type="submit">Edit User</button>
+                    </div>
+                </form>
+            </div>
     <?php
         }
     }

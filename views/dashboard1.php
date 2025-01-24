@@ -1,5 +1,6 @@
 <?php
 include '../config/dataBaseConnect.php';
+include './pagination2.php';
 
 session_start();
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
@@ -9,42 +10,49 @@ if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
 }
 
 //pagination
-$recordsPerPage = 5;
+// $recordsPerPage = 5;
 
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
-$startFrom = ($page - 1) * $recordsPerPage;
+// $page = isset($_GET['page']) ? $_GET['page'] : 1;
+// $startFrom = ($page - 1) * $recordsPerPage;
 
-$sql = "SELECT * FROM `users` LIMIT $startFrom, $recordsPerPage";
+// $sql = "SELECT * FROM `users` LIMIT $startFrom, $recordsPerPage";
 
-// Search functionality
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $searchResult = $_GET['search'];
-    $sql = "SELECT * FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%' LIMIT $startFrom, $recordsPerPage";
-}
+// // Search functionality
+// if (isset($_GET['search']) && !empty($_GET['search'])) {
+//     $searchResult = $_GET['search'];
+//     $sql = "SELECT * FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%' LIMIT $startFrom, $recordsPerPage";
+// }
 
-// Sorting functionality
-$columns = array('first_name', 'id', 'email', 'last_name');
+// // Sorting functionality
+// $columns = array('first_name', 'id', 'email', 'last_name');
 
-$column = isset($_GET['column']) && in_array($_GET['column'], $columns) ? $_GET['column'] : $columns[0];
-$sort_order = isset($_GET['order']) && strtolower($_GET['order']) == 'desc' ? 'DESC' : 'ASC';
-$sortSql = "SELECT * FROM `users`  ORDER BY $column $sort_order";  
+// $column = isset($_GET['column']) && in_array($_GET['column'], $columns) ? $_GET['column'] : $columns[0];
+// $sort_order = isset($_GET['order']) && strtolower($_GET['order']) == 'desc' ? 'DESC' : 'ASC';
+// $sortSql = "SELECT * FROM `users`  ORDER BY $column $sort_order";  
 
-// Count total records for pagination
-$countSql = "SELECT COUNT(*) AS total FROM `users`";
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $countSql = "SELECT COUNT(*) AS total FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
-}
-$countResult = $connection->query($countSql);
-$countRow = $countResult->fetch_assoc();
-$totalRecords = $countRow['total'];
+// // Count total records for pagination
+// $countSql = "SELECT COUNT(*) AS total FROM `users`";
+// if (isset($_GET['search']) && !empty($_GET['search'])) {
+//     $countSql = "SELECT COUNT(*) AS total FROM `users` WHERE CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
+// }
+// $countResult = $connection->query($countSql);
+// $countRow = $countResult->fetch_assoc();
+// $totalRecords = $countRow['total'];
 
-$totalPages = ceil($totalRecords / $recordsPerPage);
+// $totalPages = ceil($totalRecords / $recordsPerPage);
 
-// Execute the final query (sorting and pagination combined)
-$finalSql = $sortSql . " LIMIT $startFrom, $recordsPerPage";
-$result = $connection->query($finalSql);
+// // Execute the final query (sorting and pagination combined)
+// $finalSql = $sortSql . " LIMIT $startFrom, $recordsPerPage";
+// $result = $connection->query($finalSql);
 
-
+// Get the pagination results
+$paginationData = pagination($connection);
+$result = $paginationData['result'];
+$total_pages = $paginationData['total_pages'];
+$searchResult = $paginationData['search'];
+$page = $paginationData['current_page'];
+$sort_column = $paginationData['sort_column'];
+$sort_order = $paginationData['sort_order'];
 ?>
 
 <!doctype html>
@@ -188,4 +196,62 @@ $result = $connection->query($finalSql);
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
 
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Users Dashboard</h1>
+
+    <!-- Search Box -->
+    <form method="GET" id="search-form">
+        <input type="text" id="search-box" name="search" placeholder="Search users..." value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>" oninput="this.form.submit()">
+    </form>
+
+    <!-- Table for displaying users -->
+    <table id="users-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Call the pagination function to get results
+            $paginationData = pagination($connection);
+
+            // Loop through the results and display them
+            while ($row = $paginationData['result']->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($row['id']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['first_name']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['last_name']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+
+    <!-- Pagination (will be updated dynamically) -->
+    <div id="pagination">
+        <?php
+        // Display pagination links
+        for ($page = 1; $page <= $paginationData['total_pages']; $page++) {
+            echo "<a href='?page=$page&search=" . urlencode($paginationData['search']) . "&sort_column=" . $paginationData['sort_column'] . "&sort_order=" . $paginationData['sort_order'] . "'>$page</a> ";
+        }
+        ?>
+    </div>
+
+</body>
 </html>

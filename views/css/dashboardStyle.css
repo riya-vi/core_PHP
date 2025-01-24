@@ -9,6 +9,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+
 /* navbar */
 ul {
     background-color: rgb(53, 51, 51);
@@ -17,16 +18,17 @@ ul {
     overflow: hidden;
     list-style-type: none;
 }
-li{
+ul li{
     float: left;
+    
 }
 li a{
     padding: 15px 18px;
     color: white;
     display: block;
     text-align: center;
+    font-weight: bold;
 }
-
 
 
 /* table */
@@ -67,8 +69,9 @@ tr:hover {
 
 /* pagination css */
 .pagination {
-    display: inline-block;
     margin-top: 25px;
+    float: right;
+    
 }
 
 .pagination a {
