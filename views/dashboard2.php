@@ -1,4 +1,3 @@
-
 <?php
 include '../config/dataBaseConnect.php';
 include './pagination.php';
@@ -10,15 +9,16 @@ if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
     exit;
 }
 
-$paginationData = listUser($connection);
+// Get the pagination results
+$paginationData = pagination($connection);
 $result = $paginationData['result'];
-$totalPages = $paginationData['totalPages'];
+$total_pages = $paginationData['total_pages'];
 $searchResult = $paginationData['search'];
-$page = $paginationData['currentPage'];
-$sortColumn = $paginationData['sortColumn'];
-$sortOrder = $paginationData['sortOrder'];
-$countryFilter = $paginationData['countryFilter'];
-$stateFilter = $paginationData['stateFilter'];
+$page = $paginationData['current_page'];
+$sort_column = $paginationData['sort_column'];
+$sort_order = $paginationData['sort_order'];
+$country_filter = $paginationData['country_filter'];
+$state_filter = $paginationData['state_filter'];
 
 ?>
 
@@ -31,7 +31,6 @@ $stateFilter = $paginationData['stateFilter'];
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-
     <link rel="stylesheet" href="./css/dashboardStyle.css">
 </head>
 
@@ -67,24 +66,28 @@ $stateFilter = $paginationData['stateFilter'];
     <!-- Filter Form -->
     <form action="" method="GET">
         <div class="row">
-            <select name="countryFilter">
+            <select name="country_filter">
                 <option value="">Filter by Country</option>
                 <?php
                 $countries = $connection->query("SELECT DISTINCT country FROM `users`");
                 while ($row = $countries->fetch_assoc()) {
-                    $selected = $countryFilter == $row['country'] ? 'selected' : '';
-                    echo "<option value='{$row['country']}' $selected>{$row['country']}</option>";
+                    if (preg_match("/^[a-zA-Z\s]+$/", $row['country'])) { // Validate only alphabetic characters
+                        $selected = $country_filter == $row['country'] ? 'selected' : '';
+                        echo "<option value='{$row['country']}' $selected>{$row['country']}</option>";
+                    }
                 }
                 ?>
             </select>
 
-            <select name="stateFilter">
+            <select name="state_filter">
                 <option value="">Filter by State</option>
                 <?php
                 $states = $connection->query("SELECT DISTINCT state FROM `users`");
                 while ($row = $states->fetch_assoc()) {
-                    $selected = $stateFilter == $row['state'] ? 'selected' : '';
-                    echo "<option value='{$row['state']}' $selected>{$row['state']}</option>";
+                    if (preg_match("/^[a-zA-Z\s]+$/", $row['state'])) { // Validate only alphabetic characters
+                        $selected = $state_filter == $row['state'] ? 'selected' : '';
+                        echo "<option value='{$row['state']}' $selected>{$row['state']}</option>";
+                    }
                 }
                 ?>
             </select>
@@ -102,27 +105,27 @@ $stateFilter = $paginationData['stateFilter'];
             <thead>
                 <tr>
                     <th>
-                        <a href="?sortColumn=id&sortOrder=<?= $sortOrder === 'ASC' ? 'DESC' : 'ASC'; ?>">
+                        <a href="?sort_column=id&sort_order=<?= $sort_order === 'ASC' ? 'DESC' : 'ASC'; ?>">
                             Id
-                            <i class="fas fa-sort sort-icon <?= $sortColumn === 'id' ? ($sortOrder === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
+                            <i class="fas fa-sort sort-icon <?= $sort_column === 'id' ? ($sort_order === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
                         </a>
                     </th>
                     <th>
-                        <a href="?sortColumn=first_name&sortOrder=<?= $sortOrder === 'ASC' ? 'DESC' : 'ASC'; ?>">
+                        <a href="?sort_column=first_name&sort_order=<?= $sort_order === 'ASC' ? 'DESC' : 'ASC'; ?>">
                             First Name
-                            <i class="fas fa-sort sort-icon <?= $sortColumn === 'first_name' ? ($sortOrder === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
+                            <i class="fas fa-sort sort-icon <?= $sort_column === 'first_name' ? ($sort_order === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
                         </a>
                     </th>
                     <th>
-                        <a href="?sortColumn=last_name&sortOrder=<?= $sortOrder === 'ASC' ? 'DESC' : 'ASC'; ?>">
+                        <a href="?sort_column=last_name&sort_order=<?= $sort_order === 'ASC' ? 'DESC' : 'ASC'; ?>">
                             Last Name
-                            <i class="fas fa-sort sort-icon <?= $sortColumn === 'last_name' ? ($sortOrder === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
+                            <i class="fas fa-sort sort-icon <?= $sort_column === 'last_name' ? ($sort_order === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
                         </a>
                     </th>
                     <th>
-                        <a href="?sortColumn=email&sortOrder=<?= $sortOrder === 'ASC' ? 'DESC' : 'ASC'; ?>">
+                        <a href="?sort_column=email&sort_order=<?= $sort_order === 'ASC' ? 'DESC' : 'ASC'; ?>">
                             Email
-                            <i class="fas fa-sort sort-icon <?= $sortColumn === 'email' ? ($sortOrder === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
+                            <i class="fas fa-sort sort-icon <?= $sort_column === 'email' ? ($sort_order === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
                         </a>
                     </th>
                     <th>Phone NO.</th>
@@ -171,11 +174,11 @@ $stateFilter = $paginationData['stateFilter'];
                 echo '<a href="?page=' . ($page - 1) . '&search=' . $searchResult . '">Previous</a>';
             }
 
-            for ($i = 1; $i <= $totalPages; $i++) {
+            for ($i = 1; $i <= $total_pages; $i++) {
                 echo '<a href="?page=' . $i . '&search=' . $searchResult . '">' . $i . '</a>';
             }
 
-            if ($page < $totalPages) {
+            if ($page < $total_pages) {
                 echo '<a href="?page=' . ($page + 1) . '&search=' . $searchResult . '">Next</a>';
             }
             ?>
@@ -186,6 +189,7 @@ $stateFilter = $paginationData['stateFilter'];
     <script>
         const searchBox = document.getElementById("search-box");
 
+        // Restore focus and caret position after reload
         window.addEventListener("load", function() {
             searchBox.focus();
             const value = searchBox.value;
@@ -193,6 +197,7 @@ $stateFilter = $paginationData['stateFilter'];
             searchBox.value = value;
         });
 
+        // Submit the form on every input
         searchBox.addEventListener("input", function() {
             document.getElementById("search-form").submit();
         });

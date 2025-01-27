@@ -1,109 +1,12 @@
 <?php
 include '../config/dataBaseConnect.php';
+include './formValidation.php' ;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    print_r($_POST);
-    // validations
-    $firstNameErr  = $lastNameErr = $emailErr  = $phoneErr = $addressErr  = $countryErr = $stateErr  = $pincodeErr = $passwordErr = $confirmPassErr = "";
-    $isAnyError = false;
-
-    if (empty($_POST["firstName"])) {
-        $firstNameErr = "First Name is required";
-        $isAnyError = true;
-    } else {
-        $firstName = test_input($_POST["firstName"]);
-        if (!preg_match("/^[a-zA-Z-' ]*$/", $firstName)) {
-            $firstNameErr = "Only letters and white spaces are allowed";
-            $isAnyError = true;
-        }
-    }
-
-    if (empty($_POST["lastName"])) {
-        $lastNameErr = "Last Name is required";
-        $isAnyError = true;
-    } else {
-        $lastName = test_input($_POST["lastName"]);
-        if (!preg_match("/^[a-zA-Z-' ]*$/", $lastName)) {
-            $lastNameErr = "Only letters and white spaces are allowed";
-            $isAnyError = true;
-        }
-    }
-
-    if (empty($_POST["email"])) {
-        $emailErr = "Email is required";
-        $isAnyError = true;
-    } else {
-        $email = test_input($_POST["email"]);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $emailErr = "Invalid email format";
-            $isAnyError = true;
-        }
-    }
-
-    if (empty($_POST["phone"])) {
-        $phoneErr = "Phone No. is required";
-        $isAnyError = true;
-    } else {
-        $phone = test_input($_POST["phone"]);
-        if (!preg_match("/^[0-9]{10}$/", $phone)) {
-            $phoneErr = "Phone number must be 10 digits";
-            $isAnyError = true;
-        }
-    }
-
-    if (empty($_POST["address"])) {
-        $addressErr = "Address is required";
-        $isAnyError = true;
-    } else {
-        $address = test_input($_POST["address"]);
-    }
-
-    if (empty($_POST["country"])) {
-        $countryErr = "Must select a country";
-        $isAnyError = true;
-    } else {
-        $country = test_input($_POST["country"]);
-    }
-
-    if (empty($_POST["states"])) {
-        $stateErr = "Must select a state";
-        $isAnyError = true;
-    } else {
-        $state = test_input($_POST["states"]);
-    }
-
-    if (empty($_POST["pincode"])) {
-        $pincodeErr = "Pincode is required";
-        $isAnyError = true;
-    } else {
-        $pincode = test_input($_POST["pincode"]);
-    }
-
-    if (empty($_POST["password"])) {
-        $passwordErr = "Password is required";
-        $isAnyError = true;
-    } else {
-        $password = test_input($_POST["password"]);
-        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
-            $passwordErr = "Password must be at least 8 characters,one letter,digit,special character";
-            $isAnyError = true;
-        }
-    }
-
-    if (empty($_POST["confirmPass"])) {
-        $confirmPassErr = "Confirm Password is required";
-        $isAnyError = true;
-    } else {
-        $confirmPass = test_input($_POST["confirmPass"]);
-        if ($_POST['password'] !== $_POST['confirmPass']) {
-            $confirmPassErr = "Password did not match.";
-            $isAnyError = true;
-        }
-    }
-
-    //edit data in database
-    if ($isAnyError == false) {
+    $errors = validateForm($_POST);
+   
+    if (empty($errors)) {
         $id = $_POST['id'];
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
@@ -111,14 +14,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $phoneNo = $_POST['phone'];
         $address = $_POST['address'];
         $country = $_POST['country'];
-        $state = $_POST['states'];
+        $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
 
-        //encrypt password
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
-
 
         $sql = "UPDATE `users` SET `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$country', `state` ='$state' WHERE `id`= '$id'";
 
@@ -131,22 +32,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Error: " . $sql . "<br>" . $connection->error;
         }
 
-        // connection close
         $connection->close();
     }
 }
 
-function test_input($data)
-{
-    return $data;
+if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
+    $query = "SELECT id , name FROM countries";
+    $result = $connection->query($query);
+    $countries = [];
+    while ($row = $result->fetch_assoc()) {
+        $countries[] = $row;
+    }
+    echo json_encode($countries);
+    exit;
 }
 
+if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['country_id'])) {
+    $countryId = $_GET['country_id'];
+    $query = "SELECT id, name FROM states WHERE country_id = $countryId";
+    $result = $connection->query($query);
 
+    $states = [];
+    while ($row = $result->fetch_assoc()) {
+        $states[] = $row;
+    }
+
+    echo json_encode($states);
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -155,15 +72,10 @@ function test_input($data)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Edit User</title>
-
 </head>
 
 <body>
-
-
-    <?php
-    include './layout/navbar.php';
-    ?>
+    <?php include './layout/navbar.php'; ?>
 
     <h1>Edit User Details</h1>
 
@@ -175,19 +87,19 @@ function test_input($data)
     ?>
 
             <div class="container">
-                <form method="post" action="editUser.php?id=<?php echo $Id; ?>">
+                <form method="post" action="editUser.php?id=<?php echo $id; ?>">
                     <div class="form_group">
                         <label for="firstName">First name:</label>
                         <input type="text" id="firstName" name="firstName"
                             value="<?php echo $rows['first_name']; ?>"> <span class="error">
-                            <?php echo $firstNameErr; ?>
+                            <?php echo $errors['firstName'] ?? '';?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="lastName">Last name:</label>
                         <input type="text" id="lastName" name="lastName"
                             value="<?php echo $rows['last_name']; ?>"><span class="error">
-                            <?php echo $lastNameErr; ?>
+                            <?php echo $errors['lastName'] ?? '';  ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -195,14 +107,14 @@ function test_input($data)
                         <input type="text" id="email" name="email"
                             value="<?php echo $rows['email']; ?>">
                         <span class="error">
-                            <?php echo $emailErr; ?>
+                            <?php echo $errors['email'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="phone">Phone No. :</label>
                         <input type="text" id="phone" name="phone"
                             value="<?php echo $rows['phone_no']; ?>"><span class="error">
-                            <?php echo $phoneErr; ?>
+                            <?php echo $errors['phone'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -210,7 +122,7 @@ function test_input($data)
                         <textarea name="address" id="address" value=""><?php echo $rows['address']; ?>
                     </textarea>
                         <span class="error" onchange="" onclick="">
-                            <?php echo $addressErr; ?>
+                            <?php echo $errors['address'] ?? '' ; ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -219,22 +131,22 @@ function test_input($data)
                             <option value=""><?php echo $rows['country']; ?></option>
                         </select>
                         <span class="error">
-                            <?php echo $countryErr; ?>
+                            <?php echo $errors['country'] ?? '' ;; ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="state">State :</label>
-                        <select name="states" id="selectStates" value="">
+                        <select name="state" id="selectStates" value="">
                             <option value=""><?php echo $rows['state']; ?></option>
                         </select><span class="error">
-                            <?php echo $stateErr; ?>
+                            <?php echo $errors['state'] ?? '';  ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="pincode">Pincode :</label>
                         <input type="text" name="pincode" id="pincode"
                             value="<?php echo $rows['pincode']; ?>"><span class="error">
-                            <?php echo $pincodeErr; ?>
+                            <?php echo $errors['pincode'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -242,7 +154,7 @@ function test_input($data)
                         <input type="password" id="password" name="password"
                             value="<?php echo $rows['password']; ?>"><span
                             class="error">
-
+                            <?php echo $errors['password'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -250,7 +162,7 @@ function test_input($data)
                         <input type="password" id="confirmPass" name="confirmPass"
                             value="<?php echo $rows['password']; ?>"><span
                             class="error">
-
+                            <?php echo $errors['confirmPass'] ?? '' ?>
                         </span>
                     </div>
                     <input type="text" name="id" style="visibility: hidden;" value="<?php echo $id ?>">
@@ -268,7 +180,7 @@ function test_input($data)
 </html>
 
 
-<script>
+<!-- <script>
     const country = document.getElementById("selectCountry");
     const state = document.getElementById("selectStates");
     state.disabled = true;
@@ -351,4 +263,58 @@ function test_input($data)
             }
         });
     })
+</script> -->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countrySelect = document.getElementById('country');
+        const stateSelect = document.getElementById('state');
+        const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
+        const selectedState = '<?= $_POST['state'] ?? '' ?>';
+        fetch('http://localhost/php/views/registration.php?action=getCountries')
+            .then(response => response.json())
+            .then(countries => {
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.id;
+                    option.textContent = country.name;
+
+                    if (country.id === selectedCountry) {
+                        option.selected = true;
+                    }
+                    countrySelect.appendChild(option);
+                });
+                if (selectedCountry) {
+                    fetchStates(selectedCountry, selectedState);
+                }
+            })
+            .catch(error => console.error('Error fetching countries:', error));
+
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+
+            if (countryId) {
+                fetchStates(countryId);
+            }
+        });
+
+        function fetchStates(countryId, preselectedState = '') {
+            fetch(`http://localhost/php/views/registration.php?action=getStates&country_id=${countryId}`)
+                .then(response => response.json())
+                .then(states => {
+                    states.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.id;
+                        option.textContent = state.name;
+                        if (state.id === preselectedState) {
+                            option.selected = true;
+                        }
+                        stateSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching states:', error));
+        }
+    });
 </script>

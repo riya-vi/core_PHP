@@ -1,63 +1,32 @@
 <?php
 
+/**
+ * Handles pagination logic for fetching and counting records from the database.
+ *
+ * @param mysqli $connection The database connection object.
+ * @return array An array containing paginated results, total pages, and other query parameters.
+ */
 function pagination($connection)
 {
-    
+    // Define how many records to show per page
     $recordsPerPage = 5;
 
-    $page = isset($_GET['page']) ? $_GET['page'] : 1;
-    $startFrom = ($page - 1) * $recordsPerPage;
+    $page = getCurrentPage();
+    $startFrom = calculate($page, $recordsPerPage);
 
-    //searching
-    $searchResult = isset($_GET['search']) ? $_GET['search'] : '';
+    $searchResult = getRequestParam('search', '');
+    $sort_column = getSortColumn(['id', 'first_name', 'last_name', 'email'], 'id');
+    $sort_order = getSortOrder('ASC');
+    $country_filter = getRequestParam('country_filter', '');
+    $state_filter = getRequestParam('state_filter', '');
 
-    // sorting
-    $sort_column = isset($_GET['sort_column']) ? $_GET['sort_column'] : 'id';
-    $sort_order = isset($_GET['sort_order']) ? $_GET['sort_order'] : 'ASC';
-    $allowed_columns = ['id', 'first_name', 'last_name', 'email'];
-    $sort_column = in_array($sort_column, $allowed_columns) ? $sort_column : 'id';
-    $sort_order = ($sort_order === 'DESC') ? 'DESC' : 'ASC';
+    $whereClause = buildWhereClause($searchResult, $country_filter, $state_filter);
 
-    // filter
-    $country_filter = isset($_GET['country_filter']) ? $_GET['country_filter'] : '' ;
-    $state_filter = isset($_GET['state_filter']) ? $_GET['state_filter'] : '';
+    $sql = buildSelectQuery($whereClause, $sort_column, $sort_order, $startFrom, $recordsPerPage);
+    $result = executeQuery($connection, $sql);
 
-    $sql = "SELECT * FROM `users` WHERE 1=1";
-    
-    if (!empty($searchResult)) {
-        $sql .= "AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
-    }
-    if(!empty($country_filter)){
-        $sql .= "AND country = '$country_filter' ";
-    }
-    if(!empty($state_filter)){
-        $sql .= "AND state = '$state_filter' ";
-    }
-   
-
-    $sql .= " ORDER BY $sort_column $sort_order LIMIT $startFrom, $recordsPerPage";
-
-    echo $sql ;
-    $result = $connection->query($sql);
-
-    // Get total count of records
-    $count_sql = "SELECT COUNT(*) AS total FROM `users` WHERE 1=1";
-    if (!empty($searchResult)) {
-        $count_sql .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
-    }
-    if(!empty($country_filter)){
-        $count_sql .= "AND country = '$country_filter'" ;
-    }
-    if(!empty($state_filter)){
-        $count_sql .= "AND state = '$state_filter'" ;
-    }
-    $count_result = $connection->query($count_sql);
-    $count_row = $count_result->fetch_assoc();
-    $total_records = $count_row['total'];
-
-    // Calculate the total number of pages
-    $total_pages = ceil($total_records / $recordsPerPage);
-
+    $total_records = getTotalRecords($connection, $whereClause);
+    $total_pages = calculateTotalPages($total_records, $recordsPerPage);
     return [
         'result' => $result,
         'total_pages' => $total_pages,
@@ -69,4 +38,77 @@ function pagination($connection)
         'state_filter' => $state_filter,
     ];
 }
-?>
+
+function getCurrentPage()
+{
+    return isset($_GET['page']) ?  ($_GET['page']) : 1;
+}
+
+function calculate($page, $recordsPerPage)
+{
+    return ($page - 1) * $recordsPerPage;
+}
+
+function getRequestParam($key, $default = '')
+{
+    return isset($_GET[$key]) ? $_GET[$key] : $default;
+}
+
+function getSortColumn($allowed_columns, $default)
+{
+    return isset($_GET['sort_column']) && in_array($_GET['sort_column'], $allowed_columns)
+        ? $_GET['sort_column']
+        : $default;
+}
+
+function getSortOrder($default = 'ASC')
+{
+    return isset($_GET['sort_order']) && strtoupper($_GET['sort_order']) === 'DESC' ? 'DESC' : $default;
+}
+
+function buildWhereClause($searchResult, $country_filter, $state_filter)
+{
+    $whereClause = "1=1";
+    if (!empty($searchResult)) {
+        $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
+    }
+    if (!empty($country_filter)) {
+        $whereClause .= " AND country = '$country_filter'";
+    }
+    if (!empty($state_filter)) {
+        $whereClause .= " AND state = '$state_filter'";
+    }
+    return $whereClause;
+}
+
+function buildSelectQuery($whereClause, $sort_column, $sort_order, $startFrom, $recordsPerPage)
+{
+    return "SELECT * FROM `users` WHERE $whereClause 
+            ORDER BY $sort_column $sort_order 
+            LIMIT $startFrom, $recordsPerPage";
+}
+
+function executeQuery($connection, $sql)
+{
+    $result = $connection->query($sql);
+    if (!$result) {
+        die("SQL Query Error: " . $connection->error . " - Query: " . $sql);
+    }
+    return $result;
+}
+
+function getTotalRecords($connection, $whereClause)
+{
+    $count_sql = "SELECT COUNT(*) AS total FROM `users` WHERE $whereClause";
+    $count_result = $connection->query($count_sql);
+    if (!$count_result) {
+        die("Count Query Error: " . $connection->error . " - Query: " . $count_sql);
+    }
+    $count_row = $count_result->fetch_assoc();
+    return $count_row['total'];
+}
+
+function calculateTotalPages($total_records, $recordsPerPage)
+{
+    return ceil($total_records / $recordsPerPage);
+}
