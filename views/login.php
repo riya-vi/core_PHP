@@ -1,6 +1,6 @@
 <?php
 include '../config/dataBaseConnect.php';
- 
+
 $emailErr = $passwordErr = "";
 $email = $password = "";
 
@@ -45,8 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $row['password'])) {
           $_SESSION['email'] = $email;
           $_SESSION['password'] = $password;
-          echo isset($_SESSION['email']);
-          echo "done";
           echo '<script>alert("Logged in Successfully")</script>';
           header("Location: dashboard.php");
           exit();
@@ -101,15 +99,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
       <div class="form_group">
-        <p>don't have an account ? <a href="/registration"><span>sign up</span></a></p>
+        <span class="error"> <?php echo $loginErr ?></span>
+      </div>
+
+      <p><a href="./forgotPassword.html">forgot password ?</a></p>
+
+      <div class="form_group">
+        <button>Login</button>
       </div>
 
       <div class="form_group">
-        <span class="error"> <?php echo $loginErr ?></span>
-      </div>
-      
-      <div class="form_group">
-        <button>Login</button>
+        <p>don't have an account ? <a href="./registration.php"><span>sign up</span></a></p>
       </div>
     </form>
   </div>

@@ -24,7 +24,7 @@ function listUser($connection) {
 
     $whereClause = "1=1";
     if (!empty($searchResult)) {
-        $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
+        $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%' ";
     }
     if (!empty($countryFilter)) {
         $whereClause .= " AND country = '$countryFilter' AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";

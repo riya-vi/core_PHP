@@ -20,7 +20,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$country', '$state' , '$pincode', '$hashedPassword')";
+        $countryList = [
+            '1' => 'india',
+            '2' => 'United States',
+            '3' => 'Canada',
+            '4' =>  'japan',
+         ];
+
+        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword')";
 
         if ($connection->query($sql)) {
             header("Location: login.php");
@@ -53,7 +60,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     while ($row = $result->fetch_assoc()) {
         $states[] = $row;
     }
-
     echo json_encode($states);
     exit;
 }
@@ -73,7 +79,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
 <body>
     <div class="container">
-        <h1> Registration form</h1>
+    <h1> Registration form</h1>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 
@@ -134,8 +140,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             <div class="form_group">
                 <label for="state">State :</label>
                 <select name="state" id="state" value="">
-                </select><span class="error">
                     <option value="">Select State</option>
+                </select>
+                <span class="error">
                     <?php echo $errors['state'] ?? ''; ?>
                 </span>
             </div>
@@ -171,14 +178,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             </div>
 
             <div class="form_group">
-                <p>already have an account ? <a href="/login"><span>Login</span></a></p>
+                <p>already have an account ? <a href="./login.php"><span>Login</span></a></p>
             </div>
         </form>
     </div>
 </body>
 
-</html>
-
+</html> 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const countrySelect = document.getElementById('country');
@@ -219,7 +225,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.id;
+                        option.value = state.name;
                         option.textContent = state.name;
                         if (state.id === preselectedState) {
                             option.selected = true;

@@ -1,5 +1,4 @@
-
-    .container {
+.container {
     width: 40%;
     margin: 0 auto;
     padding: 20px;
@@ -7,42 +6,42 @@
     border-radius: 10px;
     margin-top: 50px;
     background-color: whitesmoke;
-    }
-    
-    h1 {
+}
+
+h1 {
     text-align: center;
-    }
-    
-    .form_group {
+}
+
+.form_group {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-    }
-    
-    .form_group label {
+}
+
+.form_group label {
     width: 150px;
     margin-right: 10px;
     text-align: right;
     margin-bottom: 5px;
     font-weight: bold;
-    }
+}
 
-    .form_group p{
-        margin-left: 250px;
-        font-size: large;
-    }
+.form_group p {
+    margin-left: 250px;
+    font-size: large;
+}
 
-    
-    .form_group input,
-    .form_group select,
-    .form_group textarea {
+
+.form_group input,
+.form_group select,
+.form_group textarea {
     flex: 1;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    }
-    
-   .form_group button  {
+}
+
+.form_group button {
     display: block;
     width: 100%;
     padding: 10px;
@@ -56,17 +55,13 @@
     float: right;
     margin-top: 15px;
 
-    }
-    
-   .form_group button:hover {
-    background-color: #043779;
-    }
+}
 
-    .form_group .error {
-        color: red;
-        margin-top: 5px;
-    }
-        
-        
-        
-        
+.form_group button:hover {
+    background-color: #043779;
+}
+
+.form_group .error {
+    color: red;
+    margin-top: 5px;
+}

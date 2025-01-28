@@ -1,6 +1,6 @@
 <?php
-include '../config/dataBaseConnect.php';
-include './formValidation.php';
+include './dataBaseConnect.php';
+include '../formValidation.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -13,33 +13,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $phoneNo = $_POST['phone'];
         $address = $_POST['address'];
         $country = $_POST['country'];
-        $state = $_POST['states'];
+        $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
 
-        //encrypt password
+        // echo $_POST['country'] ;
+        // var_dump($_POST['country']);
+        
+        $countryList = [
+           '1' => 'india',
+           '2' => 'United States',
+           '3' => 'Canada',
+           '4' =>  'japan',
+        ];
+
+
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$country', '$state' , '$pincode', '$hashedPassword')";
+        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword')";
 
         if ($connection->query($sql)) {
             session_start();
             $_SESSION["add_message"] = "User Added Successfully !";
-            header("Location: dashboard.php");
+            header("Location: ./dashboard.php");
         } else {
             echo "error inserting data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
         }
 
-        // connection close
-        $connection->close();
+        // $connection->close();
     }
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
     $query = "SELECT id , name FROM countries";
+
     $result = $connection->query($query);
+
     $countries = [];
     while ($row = $result->fetch_assoc()) {
         $countries[] = $row;
@@ -52,12 +63,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     $countryId = $_GET['country_id'];
     $query = "SELECT id, name FROM states WHERE country_id = $countryId";
     $result = $connection->query($query);
-
     $states = [];
     while ($row = $result->fetch_assoc()) {
         $states[] = $row;
     }
-
     echo json_encode($states);
     exit;
 }
@@ -69,8 +78,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Add User</title>
@@ -80,7 +89,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 <body>
 
     <?php
-    include './layout/navbar.php';
+    include '../layout/navbar.php';
     ?>
    
     <div class="container">
@@ -123,31 +132,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
             <div class="form_group">
                 <label for="address">Address :</label>
-                <textarea name="address" id="address" value=""> <?php if (isset($_POST['address'])) {
-                                                                    echo $_POST['address'];
-                                                                } ?>
+                <textarea name="address" id="address" value=""> 
+                <?php if (isset($_POST['address'])) 
+                { echo $_POST['address']; } 
+                 ?>
                 </textarea>
-                <span class="error" onchange="" onclick="">
+                <span class="error" >
                     <?php echo $errors['address'] ?? '' ;?>
                 </span>
             </div>
 
             <div class="form_group">
                 <label for="country">Country :</label>
-                <select name="country" id="selectCountry" value="">
+                <select name="country" id="country" value="">
                     <option value="">Select Country</option>
                 </select>
                 <span class="error">
-                    <?php echo $errors['country'] ?? '' ;?>
+                <?php echo $errors['country'] ?? '' ;?>
                 </span>
             </div>
 
             <div class="form_group">
                 <label for="state">State :</label>
-                <select name="state" id="selectStates" value="">
+                <select name="state" id="state" value="">
                     <option value="">Select State</option>
-                </select><span class="error">
-                    <?php echo $errors['state'] ?? ''; ?>
+                </select>
+                <span class="error">
+                <?php echo $errors['state'] ?? '' ;?>
                 </span>
             </div>
 
@@ -178,21 +189,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             </div>
 
             <div class="form_group">
-                <button type="submit"> register</button>
-            </div>
-
-            <div class="form_group">
-                <p>already have an account ? <a href="/login"><span>Login</span></a></p>
-            </div>
+                <button type="submit"> Add User</button>
+            </div>    
         </form>
     </div>
-
-
-
 </body>
-
 </html>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -200,14 +202,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
         const stateSelect = document.getElementById('state');
         const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
         const selectedState = '<?= $_POST['state'] ?? '' ?>';
-        fetch('http://localhost/php/views/registration.php?action=getCountries')
+        fetch('http://localhost/php/views/crud/addUser.php?action=getCountries')
             .then(response => response.json())
             .then(countries => {
                 countries.forEach(country => {
                     const option = document.createElement('option');
                     option.value = country.id;
                     option.textContent = country.name;
-
                     if (country.id === selectedCountry) {
                         option.selected = true;
                     }
@@ -219,7 +220,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             })
             .catch(error => console.error('Error fetching countries:', error));
 
-        countrySelect.addEventListener('change', function() {
+            countrySelect.addEventListener('change', function() {
             const countryId = this.value;
             stateSelect.innerHTML = '<option value="">Select State</option>';
 
@@ -229,12 +230,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
         });
 
         function fetchStates(countryId, preselectedState = '') {
-            fetch(`http://localhost/php/views/registration.php?action=getStates&country_id=${countryId}`)
+            fetch(`http://localhost/php/views/crud/addUser.php?action=getStates&country_id=${countryId}`)
                 .then(response => response.json())
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.id;
+                        option.value = state.name;
                         option.textContent = state.name;
                         if (state.id === preselectedState) {
                             option.selected = true;

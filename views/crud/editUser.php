@@ -1,11 +1,11 @@
 <?php
-include '../config/dataBaseConnect.php';
-include './formValidation.php' ;
+include './dataBaseConnect.php';
+include '../formValidation.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $errors = validateForm($_POST);
-   
+
     if (empty($errors)) {
         $id = $_POST['id'];
         $firstName = $_POST['firstName'];
@@ -18,15 +18,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
 
+        $countryList = [
+            '1' => 'india',
+            '2' => 'United States',
+            '3' => 'Canada',
+            '4' =>  'japan',
+         ];
+
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "UPDATE `users` SET `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$country', `state` ='$state' WHERE `id`= '$id'";
+        $sql = "UPDATE `users` SET `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$countryList[$country]', `state` ='$state' WHERE `id`= '$id'";
 
         if ($connection->query($sql)) {
             session_start();
             $_SESSION["edit_message"] = "Record Updated Successfully !";
-            header("Location: dashboard.php");
+            header("Location: http://localhost/php/views/dashboard.php");
         } else {
             echo "error updating  data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
@@ -64,35 +71,36 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Edit User</title>
 </head>
 
 <body>
-    <?php include './layout/navbar.php'; ?>
-
-    <h1>Edit User Details</h1>
+    <?php include '../layout/navbar.php'; ?>
 
     <?php
     $id = $_GET['id'];
     $query = "SELECT * FROM `users` WHERE id = " . $_GET['id'];
+    echo $query ;
     if ($result = $connection->query($query)) {
         while ($rows = $result->fetch_assoc()) {
     ?>
 
             <div class="container">
+                <h1>Edit User Details</h1>
                 <form method="post" action="editUser.php?id=<?php echo $id; ?>">
                     <div class="form_group">
                         <label for="firstName">First name:</label>
                         <input type="text" id="firstName" name="firstName"
                             value="<?php echo $rows['first_name']; ?>"> <span class="error">
-                            <?php echo $errors['firstName'] ?? '';?>
+                            <?php echo $errors['firstName'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
@@ -120,24 +128,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     <div class="form_group">
                         <label for="address">Address :</label>
                         <textarea name="address" id="address" value=""><?php echo $rows['address']; ?>
-                    </textarea>
-                        <span class="error" onchange="" onclick="">
-                            <?php echo $errors['address'] ?? '' ; ?>
+                        </textarea>
+                        <span class="error">
+                            <?php echo $errors['address'] ?? ''; ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="country">Country :</label>
-                        <select name="country" id="selectCountry" value="">
-                            <option value=""><?php echo $rows['country']; ?></option>
+                        <select name="country" id="country" value="">
+                        <option value=""><?php echo $rows['country']; ?></option>
                         </select>
                         <span class="error">
-                            <?php echo $errors['country'] ?? '' ;; ?>
+                            <?php 
+                            echo $errors['country'] ?? '';;
+                             ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="state">State :</label>
-                        <select name="state" id="selectStates" value="">
-                            <option value=""><?php echo $rows['state']; ?></option>
+                        <select name="state" id="state" value="">
+                        <option value=""><?php echo $rows['state']; ?></option>
                         </select><span class="error">
                             <?php echo $errors['state'] ?? '';  ?>
                         </span>
@@ -179,100 +189,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
 </html>
 
-
-<!-- <script>
-    const country = document.getElementById("selectCountry");
-    const state = document.getElementById("selectStates");
-    state.disabled = true;
-    country.addEventListener("change", stateHandle);
-
-    function stateHandle() {
-        if (country.value === " ") {
-            state.disabled = true;
-        } else {
-            state.disabled = false;
-        }
-    }
-
-    // dynamic
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("on DOm");
-
-        const countries = {
-            "India": ["Gujarat", "Maharastra", "Tamilnadu", "Rajasthan"],
-            "canada": ["Alberta", "BritishColumbia", "Manitoba", "Quebec"],
-            "USA": ["California", "Alaska", "Georgia"],
-            "Japan": ["Hokkaido", "Fukushima", "Hiroshima"]
-        };
-        const countrySelect = document.getElementById('selectCountry');
-        const stateSelect = document.getElementById('selectStates');
-        const selectedCountry = "<?php echo isset($_POST['country']) ? $_POST['country'] : ''; ?>";
-        const selectedState = "<?php echo isset($_POST['states']) ? $_POST['states'] : ''; ?>";
-
-        // console.log("selectedCountry", selectedCountry);
-
-        for (let country in countries) {
-            // console.log("country", country);
-
-            let option = document.createElement('option');
-            option.value = country;
-            option.textContent = country;
-            if (selectedCountry && country == selectedCountry) {
-                option.selected = true;
-            }
-            // console.log("option", option);
-
-            countrySelect.appendChild(option);
-        }
-
-        stateSelect.innerHTML = '<option value="" disabled selected>Select a state</option>';
-
-        let states = countries[countrySelect.value];
-        if (states) {
-            console.log("dada");
-
-            for (let state of states) {
-                let option = document.createElement('option');
-                option.value = state;
-                option.innerText = state;
-                if (selectedState && state == selectedState) {
-                    option.selected = true;
-                }
-                console.log("option", option);
-
-                stateSelect.appendChild(option);
-            }
-        }
-
-        countrySelect.addEventListener('change', function() {
-            console.log("nonad add");
-
-            stateSelect.innerHTML = '<option value="" disabled selected>Select a state</option>';
-
-            let states = countries[countrySelect.value];
-            for (let state of states) {
-                let option = document.createElement('option');
-                option.value = state;
-                option.innerText = state;
-                if (selectedState && state == selectedState) {
-                    option.selected = true;
-                }
-                console.log("option", option);
-
-                stateSelect.appendChild(option);
-            }
-        });
-    })
-</script> -->
-
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const countrySelect = document.getElementById('country');
         const stateSelect = document.getElementById('state');
         const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
         const selectedState = '<?= $_POST['state'] ?? '' ?>';
-        fetch('http://localhost/php/views/registration.php?action=getCountries')
+        fetch('http://localhost/php/views/crud/editUser.php?action=getCountries')
             .then(response => response.json())
             .then(countries => {
                 countries.forEach(country => {
@@ -301,12 +224,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
         });
 
         function fetchStates(countryId, preselectedState = '') {
-            fetch(`http://localhost/php/views/registration.php?action=getStates&country_id=${countryId}`)
+            fetch(`http://localhost/php/views/crud/editUser.php?action=getStates&country_id=${countryId}`)
                 .then(response => response.json())
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.id;
+                        option.value = state.name;
                         option.textContent = state.name;
                         if (state.id === preselectedState) {
                             option.selected = true;

@@ -1,7 +1,7 @@
-
 <?php
 include '../config/dataBaseConnect.php';
-include './pagination.php';
+// include './crud/userListing.php';
+include './crud/listingUser.php';
 
 session_start();
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
@@ -10,16 +10,15 @@ if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
     exit;
 }
 
-$paginationData = listUser($connection);
-$result = $paginationData['result'];
-$totalPages = $paginationData['totalPages'];
-$searchResult = $paginationData['search'];
-$page = $paginationData['currentPage'];
-$sortColumn = $paginationData['sortColumn'];
-$sortOrder = $paginationData['sortOrder'];
-$countryFilter = $paginationData['countryFilter'];
-$stateFilter = $paginationData['stateFilter'];
-
+$listUserData = listUser($connection);
+$result = $listUserData['result'];
+$totalPages = $listUserData['totalPages'];
+$searchResult = $listUserData['search'];
+$page = $listUserData['currentPage'];
+$sortColumn = $listUserData['sortColumn'];
+$sortOrder = $listUserData['sortOrder'];
+$countryFilter = $listUserData['countryFilter'];
+$stateFilter = $listUserData['stateFilter'];
 ?>
 
 <!doctype html>
@@ -31,7 +30,6 @@ $stateFilter = $paginationData['stateFilter'];
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-
     <link rel="stylesheet" href="./css/dashboardStyle.css">
 </head>
 
@@ -60,7 +58,7 @@ $stateFilter = $paginationData['stateFilter'];
             <form method="GET" id="search-form">
                 <input type="text" id="search-box" name="search" placeholder="Search users..." value="<?= htmlspecialchars($searchResult) ?>" />
             </form>
-            <a href="./addUser.php"><button class="btn btn-success">+ Add New</button></a>
+            <a href="./crud/addUser.php"><button class="btn btn-success">+ Add New</button></a>
         </div>
     </nav>
 
@@ -149,8 +147,8 @@ $stateFilter = $paginationData['stateFilter'];
                             <td><?= $rows['state'] ?></td>
                             <td><?= $rows['pincode'] ?></td>
                             <td>
-                                <a href="./editUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
-                                <a href="./deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
+                                <a href="./crud/editUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
+                                <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
                             </td>
                         </tr>
                 <?php
@@ -168,7 +166,7 @@ $stateFilter = $paginationData['stateFilter'];
         <div class="pagination" style="margin-right: 20px;">
             <?php
             if ($page > 1) {
-                echo '<a href="?page=' . ($page - 1) . '&search=' . $searchResult . '">Previous</a>';
+                echo '<a href="?page=' . ($page) . '&search=' . $searchResult . '">Previous</a>';
             }
 
             for ($i = 1; $i <= $totalPages; $i++) {
@@ -176,7 +174,7 @@ $stateFilter = $paginationData['stateFilter'];
             }
 
             if ($page < $totalPages) {
-                echo '<a href="?page=' . ($page + 1) . '&search=' . $searchResult . '">Next</a>';
+                echo '<a href="?page=' . ($page) . '&search=' . $searchResult . '">Next</a>';
             }
             ?>
         </div>
@@ -199,4 +197,5 @@ $stateFilter = $paginationData['stateFilter'];
     </script>
 
 </body>
+
 </html>

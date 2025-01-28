@@ -1,5 +1,5 @@
 <?php
-include '../config/dataBaseConnect.php';
+include './dataBaseConnect.php';
 
 // delete user 
     $id = $_GET["id"];    
@@ -9,9 +9,10 @@ include '../config/dataBaseConnect.php';
     echo "here2" ;
 
     if ($connection->query($sql)) {
+        echo 'here 3' ;
         session_start();
         $_SESSION["delete_message"]="Record deleted Successfully !";
-        header("Location: dashboard.php");
+        header("Location: http://localhost/php/views/dashboard.php");
     } else {
         echo "Something went wrong. Please try again later.";
         echo "Error:" . $sql . "<br>" . $connection->error;
