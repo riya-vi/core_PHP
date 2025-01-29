@@ -27,16 +27,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            '4' =>  'japan',
         ];
 
-
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword')";
+        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password` ,`file_path`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword' , '')";
 
         if ($connection->query($sql)) {
             session_start();
             $_SESSION["add_message"] = "User Added Successfully !";
-            header("Location: ./dashboard.php");
+            header("Location: ../dashboard.php");
         } else {
             echo "error inserting data .";
             echo "Error: " . $sql . "<br>" . $connection->error;

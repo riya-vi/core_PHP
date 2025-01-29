@@ -10,6 +10,8 @@ function listUser($connection) {
     $recordsPerPage = 5;
 
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    // $page =  $_GET['page'] ?? '';
+
     $startFrom = ($page - 1) * $recordsPerPage;
 
     $searchResult = isset($_GET['search']) ? $_GET['search'] : '';
@@ -23,16 +25,16 @@ function listUser($connection) {
     $stateFilter = isset($_GET['stateFilter']) ? $_GET['stateFilter'] : '';
 
     $whereClause = "1=1";
+    if (!empty($countryFilter)) {
+        $whereClause .= " AND country = '$countryFilter'";
+    }
+    if (!empty($stateFilter)) {
+        $whereClause .= " AND state = '$stateFilter'";
+    }
     if (!empty($searchResult)) {
         $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%' ";
     }
-    if (!empty($countryFilter)) {
-        $whereClause .= " AND country = '$countryFilter' AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
-    }
-    if (!empty($stateFilter)) {
-        $whereClause .= " AND state = '$stateFilter' AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%'";
-    }
-    
+   
     $sql = "SELECT * FROM `users` WHERE $whereClause 
             ORDER BY $sortColumn $sortOrder 
             LIMIT $startFrom, $recordsPerPage";

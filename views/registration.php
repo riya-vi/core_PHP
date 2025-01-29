@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $phoneNo = $_POST['phone'];
         $address = $_POST['address'];
         $country = $_POST['country'];
-        $state = $_POST['states'];
+        $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
 
@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             '4' =>  'japan',
          ];
 
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword')";
+        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password` , `file_path`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword' , '')";
 
         if ($connection->query($sql)) {
             header("Location: login.php");
@@ -227,7 +227,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                         const option = document.createElement('option');
                         option.value = state.name;
                         option.textContent = state.name;
-                        if (state.id === preselectedState) {
+                        if (state.name === preselectedState) {
                             option.selected = true;
                         }
                         stateSelect.appendChild(option);

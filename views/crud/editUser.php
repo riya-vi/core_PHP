@@ -23,23 +23,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             '2' => 'United States',
             '3' => 'Canada',
             '4' =>  'japan',
-         ];
+        ];
 
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "UPDATE `users` SET `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$countryList[$country]', `state` ='$state' WHERE `id`= '$id'";
+        $defaultPhoto = '../storage/default.jpg';
+        $defaultPath = '../storage/default.jpg';
+        // $fileDestination = 'assa';
+        // print_r($_FILES['profilePhoto']);
+        if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] == 0) {
+            $file = $_FILES['profilePhoto'];
+            //  var_dump($file);
+            $uploadDir = realpath(__DIR__ . '/../../storage/profile_images/') .'/';
+            $fileName =  basename($file['name']);
+            $fileDestination = $uploadDir . $fileName;   
+
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+            // if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $fileDestination)) {
+            //     echo "File successfully moved.";
+            //     $fileName = $fileDestination;
+            // } else {
+            //     echo "Error moving file.";
+            //     echo $_FILES['profilePhoto']['error'];
+            //     $fileName = $defaultPhoto;
+            // }
+
+            // $uploads_dir = 'uploads/';
+            // $name = 'demo.png';
+            // if (is_uploaded_file($_FILES['profilePhoto']['tmp_name']))
+            // {       
+            //     echo "uploadded";
+            //     //in case you want to move  the file in uploads directory
+            //     move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $uploadDir.$name);
+            //     echo 'moved file to destination directory';
+            //     exit;
+            // }else{
+            //     echo "not uploadded";
+            // }
+
+            if (in_array($_FILES['profilePhoto']['type'], $allowedTypes) && $_FILES['profilePhoto']['size'] < 5000000) { 
+                if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'],$uploadDir. $_FILES['profilePhoto']['name'])) {
+                    $fileName = $fileDestination;
+                } else {
+                    echo "Error uploading file.";
+                    // echo $_FILES['profilePhoto']['error'];
+                    $fileName = $defaultPhoto;
+                    // exit;
+                }
+            } else {
+                echo "Invalid file type or size.";
+                $fileName = $defaultPhoto;
+                // exit;
+            }
+        } else {
+            // echo "in else";
+            $fileName = $defaultPhoto;
+        }
+
+        // echo "FInal one";
+        echo $fileDestination;
+        $sql = "UPDATE `users` SET  `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$countryList[$country]', `state` ='$state' , `file_path` = '$fileDestination' WHERE `id`= '$id'";
 
         if ($connection->query($sql)) {
             session_start();
             $_SESSION["edit_message"] = "Record Updated Successfully !";
-            header("Location: http://localhost/php/views/dashboard.php");
+            header("Location: ../dashboard.php");
         } else {
             echo "error updating  data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
+            // die;
         }
-
-        $connection->close();
     }
 }
 
@@ -88,14 +143,17 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     <?php
     $id = $_GET['id'];
     $query = "SELECT * FROM `users` WHERE id = " . $_GET['id'];
-    echo $query ;
+    echo $query;
     if ($result = $connection->query($query)) {
         while ($rows = $result->fetch_assoc()) {
     ?>
-
             <div class="container">
                 <h1>Edit User Details</h1>
-                <form method="post" action="editUser.php?id=<?php echo $id; ?>">
+                <form method="post" action="editUser.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
+                    <div class="form_group">
+                        <label for="firstName">Profile Photo :</label>
+                        <input type="file" id="profilePhoto" name="profilePhoto">
+                    </div>
                     <div class="form_group">
                         <label for="firstName">First name:</label>
                         <input type="text" id="firstName" name="firstName"
@@ -136,18 +194,18 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     <div class="form_group">
                         <label for="country">Country :</label>
                         <select name="country" id="country" value="">
-                        <option value=""><?php echo $rows['country']; ?></option>
+                            <option value=""><?php echo $rows['country']; ?></option>
                         </select>
                         <span class="error">
-                            <?php 
+                            <?php
                             echo $errors['country'] ?? '';;
-                             ?>
+                            ?>
                         </span>
                     </div>
                     <div class="form_group">
                         <label for="state">State :</label>
                         <select name="state" id="state" value="">
-                        <option value=""><?php echo $rows['state']; ?></option>
+                            <option value=""><?php echo $rows['state']; ?></option>
                         </select><span class="error">
                             <?php echo $errors['state'] ?? '';  ?>
                         </span>

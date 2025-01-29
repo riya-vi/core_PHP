@@ -105,6 +105,7 @@ $stateFilter = $listUserData['stateFilter'];
                             <i class="fas fa-sort sort-icon <?= $sortColumn === 'id' ? ($sortOrder === 'ASC' ? 'fa-sort-up active' : 'fa-sort-down active') : '' ?>"></i>
                         </a>
                     </th>
+                    <th>Profile Photo</th>
                     <th>
                         <a href="?sortColumn=first_name&sortOrder=<?= $sortOrder === 'ASC' ? 'DESC' : 'ASC'; ?>">
                             First Name
@@ -128,16 +129,20 @@ $stateFilter = $listUserData['stateFilter'];
                     <th>Country</th>
                     <th>State</th>
                     <th>Pincode</th>
+                    <th>File Path</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
+                $image = './storage/default.php' ;
                 if ($result->num_rows > 0) {
                     while ($rows = $result->fetch_assoc()) {
                 ?>
                         <tr>
                             <td><?= $rows['id'] ?></td>
+                            <!-- <td><img src="./storage/default.jpg" alt="profile img" width="50" height="50"></td> -->
+                            <td><img src="<?php echo $image ?>" alt="profile img" width="50" height="50"></td>
                             <td><?= $rows['first_name'] ?></td>
                             <td><?= $rows['last_name'] ?></td>
                             <td><?= $rows['email'] ?></td>
@@ -146,6 +151,7 @@ $stateFilter = $listUserData['stateFilter'];
                             <td><?= $rows['country'] ?></td>
                             <td><?= $rows['state'] ?></td>
                             <td><?= $rows['pincode'] ?></td>
+                            <td><?= $rows['file_path'] ?></td>
                             <td>
                                 <a href="./crud/editUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
                                 <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>

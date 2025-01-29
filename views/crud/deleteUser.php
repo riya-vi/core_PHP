@@ -12,7 +12,7 @@ include './dataBaseConnect.php';
         echo 'here 3' ;
         session_start();
         $_SESSION["delete_message"]="Record deleted Successfully !";
-        header("Location: http://localhost/php/views/dashboard.php");
+        header("Location: ../dashboard.php");
     } else {
         echo "Something went wrong. Please try again later.";
         echo "Error:" . $sql . "<br>" . $connection->error;
