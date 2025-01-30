@@ -34,7 +34,7 @@ function listUser($connection) {
     if (!empty($searchResult)) {
         $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%' ";
     }
-   
+    
     $sql = "SELECT * FROM `users` WHERE $whereClause 
             ORDER BY $sortColumn $sortOrder 
             LIMIT $startFrom, $recordsPerPage";

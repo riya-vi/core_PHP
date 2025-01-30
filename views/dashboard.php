@@ -3,6 +3,7 @@ include '../config/dataBaseConnect.php';
 // include './crud/userListing.php';
 include './crud/listingUser.php';
 
+
 session_start();
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
     echo "<script> alert('Please login first') </script>";
@@ -51,6 +52,7 @@ $stateFilter = $listUserData['stateFilter'];
         }
         ?>
     </div>
+
 
     <!-- Search & Add User -->
     <nav class="navbar navbar-light bg-light">
@@ -135,14 +137,20 @@ $stateFilter = $listUserData['stateFilter'];
             </thead>
             <tbody>
                 <?php
-                $image = './storage/default.php' ;
                 if ($result->num_rows > 0) {
                     while ($rows = $result->fetch_assoc()) {
                 ?>
                         <tr>
                             <td><?= $rows['id'] ?></td>
-                            <!-- <td><img src="./storage/default.jpg" alt="profile img" width="50" height="50"></td> -->
-                            <td><img src="<?php echo $image ?>" alt="profile img" width="50" height="50"></td>
+                            <td> <?php
+                                    if (!empty($rows['file_path'])) {
+                                        $imagePath = '..'.$rows['file_path'];
+                                    } else {
+                                        $imagePath = '../storage/default.jpg';
+                                    }
+                                    ?>
+                                <img src="<?= $imagePath ?>" alt="Profile Image" width="50" height="50">
+                            </td>
                             <td><?= $rows['first_name'] ?></td>
                             <td><?= $rows['last_name'] ?></td>
                             <td><?= $rows['email'] ?></td>
@@ -153,7 +161,7 @@ $stateFilter = $listUserData['stateFilter'];
                             <td><?= $rows['pincode'] ?></td>
                             <td><?= $rows['file_path'] ?></td>
                             <td>
-                                <a href="./crud/editUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
+                                <a href="./crud/editUser2.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
                                 <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
                             </td>
                         </tr>

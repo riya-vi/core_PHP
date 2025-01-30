@@ -16,9 +16,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
-
-        // echo $_POST['country'] ;
-        // var_dump($_POST['country']);
         
         $countryList = [
            '1' => 'india',

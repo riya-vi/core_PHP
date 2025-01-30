@@ -6,8 +6,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $errors = validateForm($_POST);
 
+    // $fileErr = validateFile($_FILES);
+
     if (empty($errors)) {
         $id = $_POST['id'];
+        $filePath = $_FILES['profilePhoto'];
+        // echo $filePath;
+        //  die() ;
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
         $email = $_POST['email'];
@@ -28,72 +33,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $defaultPhoto = '../storage/default.jpg';
-        $defaultPath = '../storage/default.jpg';
-        // $fileDestination = 'assa';
-        // print_r($_FILES['profilePhoto']);
-        if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] == 0) {
-            $file = $_FILES['profilePhoto'];
-            //  var_dump($file);
-            $uploadDir = realpath(__DIR__ . '/../../storage/profile_images/') .'/';
-            $fileName =  basename($file['name']);
-            $fileDestination = $uploadDir . $fileName;   
+        $uploadDir = realpath(__DIR__ . '/../../storage/profile_images/') . '/';
+        $defaultPhoto = '/storage/default.jpg';
+        $filePath = $defaultPhoto;
+
+        if ($_FILES['profilePhoto']['error'] == 0) {
+            $fileName =  basename($_FILES['profilePhoto']['name']);
+            $fileDestination = $uploadDir . $fileName;
 
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            $fileSizeLimit = 5000000; // 5MB
+            $fileType = $_FILES['profilePhoto']['type'];
+            $fileSize = $_FILES['profilePhoto']['size'];
+            if (!in_array($fileType, $allowedTypes)) {
+                // echo "Invalid file type. Only JPEG, PNG, and GIF are allowed.";
+                echo '<script>alert("Invalid file type. Only JPEG, PNG, and GIF are allowed.")</script>';
 
-            // if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $fileDestination)) {
-            //     echo "File successfully moved.";
-            //     $fileName = $fileDestination;
-            // } else {
-            //     echo "Error moving file.";
-            //     echo $_FILES['profilePhoto']['error'];
-            //     $fileName = $defaultPhoto;
-            // }
-
-            // $uploads_dir = 'uploads/';
-            // $name = 'demo.png';
-            // if (is_uploaded_file($_FILES['profilePhoto']['tmp_name']))
-            // {       
-            //     echo "uploadded";
-            //     //in case you want to move  the file in uploads directory
-            //     move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $uploadDir.$name);
-            //     echo 'moved file to destination directory';
-            //     exit;
-            // }else{
-            //     echo "not uploadded";
-            // }
-
-            if (in_array($_FILES['profilePhoto']['type'], $allowedTypes) && $_FILES['profilePhoto']['size'] < 5000000) { 
-                if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'],$uploadDir. $_FILES['profilePhoto']['name'])) {
-                    $fileName = $fileDestination;
-                } else {
-                    echo "Error uploading file.";
-                    // echo $_FILES['profilePhoto']['error'];
-                    $fileName = $defaultPhoto;
-                    // exit;
-                }
-            } else {
-                echo "Invalid file type or size.";
-                $fileName = $defaultPhoto;
-                // exit;
+                exit;
             }
-        } else {
-            // echo "in else";
-            $fileName = $defaultPhoto;
-        }
 
-        // echo "FInal one";
-        echo $fileDestination;
-        $sql = "UPDATE `users` SET  `first_name` = '$firstName' ,`last_name` ='$lastName', `email`=  '$email', `phone_no`='$phoneNo', `address`='$address' , `country`='$countryList[$country]', `state` ='$state' , `file_path` = '$fileDestination' WHERE `id`= '$id'";
+            if ($fileSize > $fileSizeLimit) {
+                // echo "File size exceeds 5MB limit.";
+                echo '<script>alert("File size exceeds 5MB limit.")</script>';
+                exit;
+            }
 
-        if ($connection->query($sql)) {
-            // session_start();
-            // $_SESSION["edit_message"] = "Record Updated Successfully !";
-            // header("Location: ../dashboard.php");
-        } else {
-            echo "error updating  data .";
-            echo "Error: " . $sql . "<br>" . $connection->error;
-            die;
+            if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $fileDestination)) {
+                $filePath = '/storage/profile_images/' . $fileName;
+            }
+
+            $sql = "UPDATE `users` SET `first_name` = '$firstName',  `last_name` = '$lastName',  `email` = '$email',  `phone_no` = '$phoneNo', `address` = '$address',  `country` = '$countryList[$country]',  `state` = '$state',  `file_path` = '$filePath'  WHERE `id` = '$id'";
+
+            if ($connection->query($sql)) {
+                session_start();
+                $_SESSION["edit_message"] = "Record Updated Successfully!";
+                header("Location: ../dashboard.php");
+                exit;
+            } else {
+                echo "Error updating data: " . $connection->error;
+            }
         }
     }
 }
@@ -149,10 +127,15 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     ?>
             <div class="container">
                 <h1>Edit User Details</h1>
-                <form method="post" action="editUser.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
+                <form method="post" action="editUser2.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
                     <div class="form_group">
                         <label for="firstName">Profile Photo :</label>
                         <input type="file" id="profilePhoto" name="profilePhoto">
+                        <span class="error">
+                            <?php
+                            // echo $fileErr['filePath'] 
+                            ?>
+                        </span>
                     </div>
                     <div class="form_group">
                         <label for="firstName">First name:</label>
@@ -253,7 +236,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
         const stateSelect = document.getElementById('state');
         const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
         const selectedState = '<?= $_POST['state'] ?? '' ?>';
-        fetch('http://localhost/php/views/crud/editUser.php?action=getCountries')
+        fetch('http://localhost/php/views/crud/editUser2.php?action=getCountries')
             .then(response => response.json())
             .then(countries => {
                 countries.forEach(country => {
@@ -282,7 +265,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
         });
 
         function fetchStates(countryId, preselectedState = '') {
-            fetch(`http://localhost/php/views/crud/editUser.php?action=getStates&country_id=${countryId}`)
+            fetch(`http://localhost/php/views/crud/editUser2.php?action=getStates&country_id=${countryId}`)
                 .then(response => response.json())
                 .then(states => {
                     states.forEach(state => {
