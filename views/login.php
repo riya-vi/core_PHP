@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <span class="error"> <?php echo $loginErr ?></span>
       </div>
 
-      <p><a href="./forgotPassword.html">forgot password ?</a></p>
+      <p><a href="../forgotPassword.php">forgot password ?</a></p>
 
       <div class="form_group">
         <button>Login</button>

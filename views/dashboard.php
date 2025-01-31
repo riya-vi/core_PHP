@@ -70,22 +70,22 @@ $stateFilter = $listUserData['stateFilter'];
             <select name="countryFilter">
                 <option value="">Filter by Country</option>
                 <?php
-                $countries = $connection->query("SELECT DISTINCT country FROM `users`");
-                while ($row = $countries->fetch_assoc()) {
-                    $selected = $countryFilter == $row['country'] ? 'selected' : '';
-                    echo "<option value='{$row['country']}' $selected>{$row['country']}</option>";
-                }
+                // $countries = $connection->query("SELECT DISTINCT country FROM `users`");
+                // while ($row = $countries->fetch_assoc()) {
+                //     $selected = $countryFilter == $row['country'] ? 'selected' : '';
+                //     echo "<option value='{$row['country']}' $selected>{$row['country']}</option>";
+                // }
                 ?>
             </select>
 
             <select name="stateFilter">
                 <option value="">Filter by State</option>
                 <?php
-                $states = $connection->query("SELECT DISTINCT state FROM `users`");
-                while ($row = $states->fetch_assoc()) {
-                    $selected = $stateFilter == $row['state'] ? 'selected' : '';
-                    echo "<option value='{$row['state']}' $selected>{$row['state']}</option>";
-                }
+                // $states = $connection->query("SELECT DISTINCT state FROM `users`");
+                // while ($row = $states->fetch_assoc()) {
+                //     $selected = $stateFilter == $row['state'] ? 'selected' : '';
+                //     echo "<option value='{$row['state']}' $selected>{$row['state']}</option>";
+                // }
                 ?>
             </select>
 
@@ -156,8 +156,8 @@ $stateFilter = $listUserData['stateFilter'];
                             <td><?= $rows['email'] ?></td>
                             <td><?= $rows['phone_no'] ?></td>
                             <td><?= $rows['address'] ?></td>
-                            <td><?= $rows['country'] ?></td>
-                            <td><?= $rows['state'] ?></td>
+                            <td><?=  $rows['country'] ?></td>
+                            <td><?=  $rows['state'] ?></td>
                             <td><?= $rows['pincode'] ?></td>
                             <td><?= $rows['file_path'] ?></td>
                             <td>

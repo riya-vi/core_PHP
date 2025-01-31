@@ -4,6 +4,8 @@ include '../formValidation.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    // print_r($_POST);
+    // return;
     $errors = validateForm($_POST);
 
     if (empty($errors)) {
@@ -16,18 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
-        
-        $countryList = [
-           '1' => 'india',
-           '2' => 'United States',
-           '3' => 'Canada',
-           '4' =>  'japan',
-        ];
 
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password` ,`file_path`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword' , '')";
+        $sql = "INSERT INTO users (first_name, last_name, email, phone_no, address, country_id, state_id, pincode, password) 
+        VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country' , '$state','$pincode', '$hashedPassword')";
 
         if ($connection->query($sql)) {
             session_start();
@@ -37,8 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "error inserting data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
         }
-
-        // $connection->close();
     }
 }
 
@@ -87,9 +81,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     <?php
     include '../layout/navbar.php';
     ?>
-   
+
     <div class="container">
-    <h1>Enter User Details</h1>
+        <h1>Enter User Details</h1>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 
@@ -128,13 +122,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
             <div class="form_group">
                 <label for="address">Address :</label>
-                <textarea name="address" id="address" value=""> 
-                <?php if (isset($_POST['address'])) 
-                { echo $_POST['address']; } 
-                 ?>
+                <textarea name="address" id="address" value="">
+                <?php if (isset($_POST['address'])) {
+                    echo $_POST['address'];
+                }
+                ?>
                 </textarea>
-                <span class="error" >
-                    <?php echo $errors['address'] ?? '' ;?>
+                <span class="error">
+                    <?php echo $errors['address'] ?? ''; ?>
                 </span>
             </div>
 
@@ -142,9 +137,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 <label for="country">Country :</label>
                 <select name="country" id="country" value="">
                     <option value="">Select Country</option>
+                    <?php if (isset($_POST['country'])) {
+                        echo $_POST['country'];
+                    }
+                    ?>
                 </select>
                 <span class="error">
-                <?php echo $errors['country'] ?? '' ;?>
+                    <?php echo $errors['country'] ?? ''; ?>
                 </span>
             </div>
 
@@ -154,7 +153,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     <option value="">Select State</option>
                 </select>
                 <span class="error">
-                <?php echo $errors['state'] ?? '' ;?>
+                    <?php echo $errors['state'] ?? ''; ?>
                 </span>
             </div>
 
@@ -186,10 +185,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 
             <div class="form_group">
                 <button type="submit"> Add User</button>
-            </div>    
+            </div>
         </form>
+        <div class="form_group">
+            <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
+        </div>
     </div>
 </body>
+
 </html>
 
 <script>
@@ -208,6 +211,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     if (country.id === selectedCountry) {
                         option.selected = true;
                     }
+                    // option.selected = false;
+
                     countrySelect.appendChild(option);
                 });
                 if (selectedCountry) {
@@ -216,7 +221,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             })
             .catch(error => console.error('Error fetching countries:', error));
 
-            countrySelect.addEventListener('change', function() {
+        countrySelect.addEventListener('change', function() {
             const countryId = this.value;
             stateSelect.innerHTML = '<option value="">Select State</option>';
 
@@ -231,11 +236,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.name;
+                        option.value = state.id;
                         option.textContent = state.name;
-                        if (state.id === preselectedState) {
-                            option.selected = true;
-                        }
+                        // if (state.id === preselectedState) {
+                        //     option.selected = true;
+                        // }
                         stateSelect.appendChild(option);
                     });
                 })

@@ -20,14 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $countryList = [
-            '1' => 'india',
-            '2' => 'United States',
-            '3' => 'Canada',
-            '4' =>  'japan',
-         ];
-
-        $sql = "INSERT INTO `users` (`first_name` ,`last_name`, `email`, `phone_no`, `address` , `country`, `state` , `pincode`, `password` , `file_path`) VALUES ('$firstName' ,'$lastName', '$email', '$phoneNo', '$address', '$countryList[$country]', '$state' , '$pincode', '$hashedPassword' , '')";
+        $sql = "INSERT INTO users (first_name, last_name, email, phone_no, address, country_id, state_id, pincode, password) 
+        VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country' , '$state','$pincode', '$hashedPassword')";
 
         if ($connection->query($sql)) {
             header("Location: login.php");
@@ -225,7 +219,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.name;
+                        option.value = state.id;
                         option.textContent = state.name;
                         if (state.name === preselectedState) {
                             option.selected = true;

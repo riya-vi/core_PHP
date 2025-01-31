@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Handles the logic for listing user abd  fetching , counting records from the database for pagination , searching, sorting, and filtering user data.
  *
@@ -6,7 +7,8 @@
  * @return array An array containing paginated results, total pages, country-state filter, sorting and other query parameters.
  */
 
-function listUser($connection) {
+function listUser($connection)
+{
     $recordsPerPage = 5;
 
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -34,18 +36,22 @@ function listUser($connection) {
     if (!empty($searchResult)) {
         $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%' ";
     }
-    
-    $sql = "SELECT * FROM `users` WHERE $whereClause 
-            ORDER BY $sortColumn $sortOrder 
-            LIMIT $startFrom, $recordsPerPage";
+
+    $sql = "SELECT u.*, c.name AS country, s.name AS state
+        FROM users u LEFT JOIN countries c ON u.country_id = c.id
+        LEFT JOIN states s ON u.state_id = s.id
+        WHERE $whereClause 
+        ORDER BY $sortColumn $sortOrder 
+        LIMIT $startFrom, $recordsPerPage";
 
     $result = $connection->query($sql);
     if (!$result) {
         die("SQL Query Error: " . $connection->error . " - Query: " . $sql);
     }
-    
-    $countSql = "SELECT COUNT(*) AS total FROM `users` WHERE $whereClause";
+
+    $countSql = "SELECT COUNT(*) AS total FROM `users` u LEFT JOIN countries c  ON u.country_id = c.id  LEFT JOIN states s ON u.state_id = s.id WHERE $whereClause";
     $countResult = $connection->query($countSql);
+
     if (!$countResult) {
         die("Count Query Error: " . $connection->error . " - Query: " . $countSql);
     }
@@ -65,4 +71,3 @@ function listUser($connection) {
         'stateFilter' => $stateFilter,
     ];
 }
-?>

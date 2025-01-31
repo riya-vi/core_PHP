@@ -1,5 +1,5 @@
 <?php
-include '../config/dataBaseConnect.php';
+include './config/dataBaseConnect.php';
 
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -33,22 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         try {
             // $mail->SMTPDebug = 2;
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
             $mail->isSMTP();
             $mail->Host = 'mail.devvivanshinfotech.com';
-            $mail->SMTPAuth = true;
+            // $mail->SMTPAuth = true;
             $mail->Username = 'mail@devvivanshinfotech.com';
             $mail->Password = 'password';
             $mail->SMTPSecure = 'ssl';
             $mail->Port  = '465';
 
             $mail->setFrom('mail@devvivanshinfotech.com');
-            $mail->addAddress($email);
+            $mail->addAddress($toEmail);
             // $mail->addAddress('');
 
             $mail->isHTML(true);
             $mail->Subject = 'Reset Password';
-            $mail->Body = 'To Reset your Password click <a href=""> here </a>';
+            $mail->Body = 'To Reset your Password click <a href="./resetPassword.php"> here </a>';
             // $mail->AltBody = '';
             $mail->send();
             echo "Mail has been sent Successfully!";
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./views/css/style.css">
 </head>
 
 <body>
@@ -86,7 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button type="submit">Send Reset Link</button>
             </div>
             <div class="form_group">
-                <p>Back to<a href="./login.php"> Login</a></p>
+                <p>Back to<a href="../views/login.php"> Login</a></p>
+                <!-- <a href="./resetPassword.php"></a> -->
             </div>
         </form>
     </div>

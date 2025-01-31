@@ -18,17 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = $_POST['email'];
         $phoneNo = $_POST['phone'];
         $address = $_POST['address'];
-        $country = $_POST['country'];
-        $state = $_POST['state'];
+        $country = $_POST['country']; //will give country id
+        $state = $_POST['state'];     //will give state id
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
-
-        $countryList = [
-            '1' => 'india',
-            '2' => 'United States',
-            '3' => 'Canada',
-            '4' =>  'japan',
-        ];
 
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
@@ -62,12 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $filePath = '/storage/profile_images/' . $fileName;
             }
 
-            $sql = "UPDATE `users` SET `first_name` = '$firstName',  `last_name` = '$lastName',  `email` = '$email',  `phone_no` = '$phoneNo', `address` = '$address',  `country` = '$countryList[$country]',  `state` = '$state',  `file_path` = '$filePath'  WHERE `id` = '$id'";
+            $sql = "UPDATE `users` SET `first_name` = '$firstName',  `last_name` = '$lastName',  `email` = '$email',  `phone_no` = '$phoneNo', `address` = '$address',  `country` = '$country',  `state` = '$state',  `file_path` = '$filePath'  WHERE `id` = '$id'";
 
             if ($connection->query($sql)) {
                 session_start();
                 $_SESSION["edit_message"] = "Record Updated Successfully!";
-                header("Location: ../dashboard.php");
+                header("Location: dashboard.php");
                 exit;
             } else {
                 echo "Error updating data: " . $connection->error;
@@ -78,7 +71,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
     $query = "SELECT id , name FROM countries";
+
     $result = $connection->query($query);
+
     $countries = [];
     while ($row = $result->fetch_assoc()) {
         $countries[] = $row;
@@ -88,8 +83,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['country_id'])) {
+
+    isset($_GET['country_id']);
+    die();
     $countryId = $_GET['country_id'];
     $query = "SELECT id, name FROM states WHERE country_id = $countryId";
+    // echo $query ;
+    // die() ;
     $result = $connection->query($query);
 
     $states = [];
@@ -121,7 +121,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
     <?php
     $id = $_GET['id'];
     $query = "SELECT * FROM `users` WHERE id = " . $_GET['id'];
-    echo $query;
+
     if ($result = $connection->query($query)) {
         while ($rows = $result->fetch_assoc()) {
     ?>
@@ -177,7 +177,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     <div class="form_group">
                         <label for="country">Country :</label>
                         <select name="country" id="country" value="">
-                            <option value=""><?php echo $rows['country']; ?></option>
+                            <option value=""> Select Country
+                            </option>
                         </select>
                         <span class="error">
                             <?php
@@ -188,7 +189,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     <div class="form_group">
                         <label for="state">State :</label>
                         <select name="state" id="state" value="">
-                            <option value=""><?php echo $rows['state']; ?></option>
+                            <option value=" "> Select State
+                            </option>
                         </select><span class="error">
                             <?php echo $errors['state'] ?? '';  ?>
                         </span>
@@ -218,9 +220,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                     </div>
                     <input type="text" name="id" style="visibility: hidden;" value="<?php echo $id ?>">
                     <div class="form_group">
-                        <button type="submit">Edit User</button>
+                        <button type="submit" name="submit">Edit User</button>
                     </div>
+
                 </form>
+                <div class="form_group">
+                    <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
+                </div>
             </div>
     <?php
         }
@@ -270,7 +276,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 .then(states => {
                     states.forEach(state => {
                         const option = document.createElement('option');
-                        option.value = state.name;
+                        option.value = state.id;
                         option.textContent = state.name;
                         if (state.id === preselectedState) {
                             option.selected = true;

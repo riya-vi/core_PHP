@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
-    $query = "SELECT id , name FROM countries";
+    $query = "SELECT country_id , name FROM countries";
     $result = $connection->query($query);
     $countries = [];
     while ($row = $result->fetch_assoc()) {
@@ -110,8 +110,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['country_id'])) {
+    isset($_GET['country_id']) ;
+    die() ;
     $countryId = $_GET['country_id'];
-    $query = "SELECT id, name FROM states WHERE country_id = $countryId";
+    $query = "SELECT state_id, name FROM states WHERE country_id = $countryId";
     $result = $connection->query($query);
 
     $states = [];
@@ -258,12 +260,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             .then(countries => {
                 countries.forEach(country => {
                     const option = document.createElement('option');
-                    option.value = country.id;
+                    option.value = country.country_id;
                     option.textContent = country.name;
 
-                    if (country.id === selectedCountry) {
-                        option.selected = true;
-                    }
+                    // if (country.id === selectedCountry) {
+                    //     option.selected = true;
+                    // }
                     countrySelect.appendChild(option);
                 });
                 if (selectedCountry) {
@@ -289,9 +291,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                         const option = document.createElement('option');
                         option.value = state.name;
                         option.textContent = state.name;
-                        if (state.id === preselectedState) {
-                            option.selected = true;
-                        }
+                        // if (state.id === preselectedState) {
+                        //     option.selected = true;
+                        // }
                         stateSelect.appendChild(option);
                     });
                 })
