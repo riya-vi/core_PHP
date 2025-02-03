@@ -28,10 +28,10 @@ function listUser($connection)
 
     $whereClause = "1=1";
     if (!empty($countryFilter)) {
-        $whereClause .= " AND country = '$countryFilter'";
+        $whereClause .= " AND c.name = '$countryFilter'";
     }
     if (!empty($stateFilter)) {
-        $whereClause .= " AND state = '$stateFilter'";
+        $whereClause .= " AND s.name = '$stateFilter'";
     }
     if (!empty($searchResult)) {
         $whereClause .= " AND CONCAT(first_name, last_name, email) LIKE '%$searchResult%' ";

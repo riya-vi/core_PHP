@@ -1,5 +1,5 @@
 <?php
-include './dataBaseConnect.php';
+include '../../config/dataBaseConnect.php';
 include '../formValidation.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -36,30 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
-    $query = "SELECT id , name FROM countries";
-
-    $result = $connection->query($query);
-
-    $countries = [];
-    while ($row = $result->fetch_assoc()) {
-        $countries[] = $row;
-    }
-    echo json_encode($countries);
-    exit;
-}
-
-if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['country_id'])) {
-    $countryId = $_GET['country_id'];
-    $query = "SELECT id, name FROM states WHERE country_id = $countryId";
-    $result = $connection->query($query);
-    $states = [];
-    while ($row = $result->fetch_assoc()) {
-        $states[] = $row;
-    }
-    echo json_encode($states);
-    exit;
-}
 ?>
 
 <!DOCTYPE html>
@@ -137,10 +113,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
                 <label for="country">Country :</label>
                 <select name="country" id="country" value="">
                     <option value="">Select Country</option>
-                    <?php if (isset($_POST['country'])) {
-                        echo $_POST['country'];
-                    }
-                    ?>
                 </select>
                 <span class="error">
                     <?php echo $errors['country'] ?? ''; ?>
@@ -188,63 +160,17 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
             </div>
         </form>
         <div class="form_group">
-            <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
+            <a href="../dashboard.php"><button type="submit" style="float: right;">Cancel</button></a>
         </div>
     </div>
 </body>
 
 </html>
 
+<script src="../js/dynamicCountryState.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const countrySelect = document.getElementById('country');
-        const stateSelect = document.getElementById('state');
-        const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
-        const selectedState = '<?= $_POST['state'] ?? '' ?>';
-        fetch('http://localhost/php/views/crud/addUser.php?action=getCountries')
-            .then(response => response.json())
-            .then(countries => {
-                countries.forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = country.id;
-                    option.textContent = country.name;
-                    if (country.id === selectedCountry) {
-                        option.selected = true;
-                    }
-                    // option.selected = false;
-
-                    countrySelect.appendChild(option);
-                });
-                if (selectedCountry) {
-                    fetchStates(selectedCountry, selectedState);
-                }
-            })
-            .catch(error => console.error('Error fetching countries:', error));
-
-        countrySelect.addEventListener('change', function() {
-            const countryId = this.value;
-            stateSelect.innerHTML = '<option value="">Select State</option>';
-
-            if (countryId) {
-                fetchStates(countryId);
-            }
-        });
-
-        function fetchStates(countryId, preselectedState = '') {
-            fetch(`http://localhost/php/views/crud/addUser.php?action=getStates&country_id=${countryId}`)
-                .then(response => response.json())
-                .then(states => {
-                    states.forEach(state => {
-                        const option = document.createElement('option');
-                        option.value = state.id;
-                        option.textContent = state.name;
-                        // if (state.id === preselectedState) {
-                        //     option.selected = true;
-                        // }
-                        stateSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching states:', error));
-        }
+    document.addEventListener('DOMContentLoaded' , function(){
+        countryStateDropdowns('country' , 'state' , '<?= $_POST['country'] ?? '' ?>' , '<?= $_POST['state'] ?? '' ?>')
     });
 </script>
+

@@ -1,25 +1,20 @@
 <?php
-include './dataBaseConnect.php';
+include '../../config/dataBaseConnect.php';
 include '../formValidation.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $errors = validateForm($_POST);
 
-    // $fileErr = validateFile($_FILES);
-
     if (empty($errors)) {
         $id = $_POST['id'];
-        $filePath = $_FILES['profilePhoto'];
-        // echo $filePath;
-        //  die() ;
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
         $email = $_POST['email'];
         $phoneNo = $_POST['phone'];
         $address = $_POST['address'];
-        $country = $_POST['country']; //will give country id
-        $state = $_POST['state'];     //will give state id
+        $country = $_POST['country'];
+        $state = $_POST['state'];
         $pincode = $_POST['pincode'];
         $password = $_POST['password'];
 
@@ -28,25 +23,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $uploadDir = realpath(__DIR__ . '/../../storage/profile_images/') . '/';
         $defaultPhoto = '/storage/default.jpg';
-        $filePath = $defaultPhoto;
+        $filePath = $_POST['existingFilePath'] ?? $defaultPhoto;
 
         if ($_FILES['profilePhoto']['error'] == 0) {
-            $fileName =  basename($_FILES['profilePhoto']['name']);
+            $fileName = basename($_FILES['profilePhoto']['name']);
             $fileDestination = $uploadDir . $fileName;
 
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             $fileSizeLimit = 5000000; // 5MB
             $fileType = $_FILES['profilePhoto']['type'];
             $fileSize = $_FILES['profilePhoto']['size'];
-            if (!in_array($fileType, $allowedTypes)) {
-                // echo "Invalid file type. Only JPEG, PNG, and GIF are allowed.";
-                echo '<script>alert("Invalid file type. Only JPEG, PNG, and GIF are allowed.")</script>';
 
+            if (!in_array($fileType, $allowedTypes)) {
+                echo '<script>alert("Invalid file type. Only JPEG, PNG, and GIF are allowed.")</script>';
                 exit;
             }
 
             if ($fileSize > $fileSizeLimit) {
-                // echo "File size exceeds 5MB limit.";
                 echo '<script>alert("File size exceeds 5MB limit.")</script>';
                 exit;
             }
@@ -54,52 +47,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (move_uploaded_file($_FILES['profilePhoto']['tmp_name'], $fileDestination)) {
                 $filePath = '/storage/profile_images/' . $fileName;
             }
+        }
 
-            $sql = "UPDATE `users` SET `first_name` = '$firstName',  `last_name` = '$lastName',  `email` = '$email',  `phone_no` = '$phoneNo', `address` = '$address',  `country` = '$country',  `state` = '$state',  `file_path` = '$filePath'  WHERE `id` = '$id'";
+        $sql = "UPDATE `users` SET 
+            `first_name` = '$firstName',  
+            `last_name` = '$lastName',  
+            `email` = '$email',  
+            `phone_no` = '$phoneNo', 
+            `address` = '$address',  
+            `country_id` = '$country',  
+            `state_id` = '$state',  
+            `file_path` = '$filePath'  
+            WHERE `id` = '$id'";
 
-            if ($connection->query($sql)) {
-                session_start();
-                $_SESSION["edit_message"] = "Record Updated Successfully!";
-                header("Location: dashboard.php");
-                exit;
-            } else {
-                echo "Error updating data: " . $connection->error;
-            }
+        if ($connection->query($sql)) {
+            session_start();
+            $_SESSION["edit_message"] = "Record Updated Successfully!";
+            header("Location: ../dashboard.php");
+            exit;
+        } else {
+            echo "Error updating data: " . $connection->error;
         }
     }
 }
 
-if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {
-    $query = "SELECT id , name FROM countries";
 
-    $result = $connection->query($query);
 
-    $countries = [];
-    while ($row = $result->fetch_assoc()) {
-        $countries[] = $row;
-    }
-    echo json_encode($countries);
-    exit;
-}
 
-if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['country_id'])) {
+$id = $_GET['id'];
+$query = "SELECT u.*, c.name AS country_name, s.name AS state_name 
+          FROM users u
+          LEFT JOIN countries c ON u.country_id = c.id
+          LEFT JOIN states s ON u.state_id = s.id
+          WHERE u.id = $id";
+$result = $connection->query($query);
+$rows = $result->fetch_assoc();
 
-    isset($_GET['country_id']);
-    die();
-    $countryId = $_GET['country_id'];
-    $query = "SELECT id, name FROM states WHERE country_id = $countryId";
-    // echo $query ;
-    // die() ;
-    $result = $connection->query($query);
-
-    $states = [];
-    while ($row = $result->fetch_assoc()) {
-        $states[] = $row;
-    }
-
-    echo json_encode($states);
-    exit;
-}
 ?>
 
 <!DOCTYPE html>
@@ -118,173 +101,76 @@ if (isset($_GET['action']) && $_GET['action'] === 'getStates' && isset($_GET['co
 <body>
     <?php include '../layout/navbar.php'; ?>
 
-    <?php
-    $id = $_GET['id'];
-    $query = "SELECT * FROM `users` WHERE id = " . $_GET['id'];
-
-    if ($result = $connection->query($query)) {
-        while ($rows = $result->fetch_assoc()) {
-    ?>
-            <div class="container">
-                <h1>Edit User Details</h1>
-                <form method="post" action="editUser2.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
-                    <div class="form_group">
-                        <label for="firstName">Profile Photo :</label>
-                        <input type="file" id="profilePhoto" name="profilePhoto">
-                        <span class="error">
-                            <?php
-                            // echo $fileErr['filePath'] 
-                            ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="firstName">First name:</label>
-                        <input type="text" id="firstName" name="firstName"
-                            value="<?php echo $rows['first_name']; ?>"> <span class="error">
-                            <?php echo $errors['firstName'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="lastName">Last name:</label>
-                        <input type="text" id="lastName" name="lastName"
-                            value="<?php echo $rows['last_name']; ?>"><span class="error">
-                            <?php echo $errors['lastName'] ?? '';  ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="email">Email :</label>
-                        <input type="text" id="email" name="email"
-                            value="<?php echo $rows['email']; ?>">
-                        <span class="error">
-                            <?php echo $errors['email'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="phone">Phone No. :</label>
-                        <input type="text" id="phone" name="phone"
-                            value="<?php echo $rows['phone_no']; ?>"><span class="error">
-                            <?php echo $errors['phone'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="address">Address :</label>
-                        <textarea name="address" id="address" value=""><?php echo $rows['address']; ?>
-                        </textarea>
-                        <span class="error">
-                            <?php echo $errors['address'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="country">Country :</label>
-                        <select name="country" id="country" value="">
-                            <option value=""> Select Country
-                            </option>
-                        </select>
-                        <span class="error">
-                            <?php
-                            echo $errors['country'] ?? '';;
-                            ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="state">State :</label>
-                        <select name="state" id="state" value="">
-                            <option value=" "> Select State
-                            </option>
-                        </select><span class="error">
-                            <?php echo $errors['state'] ?? '';  ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="pincode">Pincode :</label>
-                        <input type="text" name="pincode" id="pincode"
-                            value="<?php echo $rows['pincode']; ?>"><span class="error">
-                            <?php echo $errors['pincode'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="password">Password :</label>
-                        <input type="password" id="password" name="password"
-                            value="<?php echo $rows['password']; ?>"><span
-                            class="error">
-                            <?php echo $errors['password'] ?? ''; ?>
-                        </span>
-                    </div>
-                    <div class="form_group">
-                        <label for="confirmPass">Confirm Password :</label>
-                        <input type="password" id="confirmPass" name="confirmPass"
-                            value="<?php echo $rows['password']; ?>"><span
-                            class="error">
-                            <?php echo $errors['confirmPass'] ?? '' ?>
-                        </span>
-                    </div>
-                    <input type="text" name="id" style="visibility: hidden;" value="<?php echo $id ?>">
-                    <div class="form_group">
-                        <button type="submit" name="submit">Edit User</button>
-                    </div>
-
-                </form>
-                <div class="form_group">
-                    <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
-                </div>
+    <div class="container">
+        <h1>Edit User Details</h1>
+        <form method="post" action="editUser2.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
+            <div class="form_group">
+                <label for="profilePhoto">Profile Photo :</label>
+                <input type="file" id="profilePhoto" name="profilePhoto">
+                <input type="hidden" name="existingFilePath" value="<?php echo $rows['file_path']; ?>">
             </div>
-    <?php
-        }
-    }
-    ?>
+            <div class="form_group">
+                <label for="firstName">First name:</label>
+                <input type="text" id="firstName" name="firstName" value="<?php echo $rows['first_name']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="lastName">Last name:</label>
+                <input type="text" id="lastName" name="lastName" value="<?php echo $rows['last_name']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="email">Email :</label>
+                <input type="text" id="email" name="email" value="<?php echo $rows['email']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="phone">Phone No. :</label>
+                <input type="text" id="phone" name="phone" value="<?php echo $rows['phone_no']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="address">Address :</label>
+                <textarea name="address" id="address"><?php echo $rows['address']; ?></textarea>
+            </div>
+            <div class="form_group">
+                <label for="country">Country :</label>
+                <select name="country" id="country">
+                    <option value="">Select Country</option>
+                </select>
+            </div>
+            <div class="form_group">
+                <label for="state">State :</label>
+                <select name="state" id="state">
+                    <option value="">Select State</option>
+                </select>
+            </div>
+            <div class="form_group">
+                <label for="pincode">Pincode :</label>
+                <input type="text" name="pincode" id="pincode" value="<?php echo $rows['pincode']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="password">Password :</label>
+                <input type="password" id="password" name="password" value="<?php echo $rows['password']; ?>">
+            </div>
+            <div class="form_group">
+                <label for="confirmPass">Confirm Password :</label>
+                <input type="password" id="confirmPass" name="confirmPass" value="<?php echo $rows['password']; ?>">
+            </div>
+            <input type="hidden" name="id" value="<?php echo $id ?>">
+            <div class="form_group">
+                <button type="submit" name="submit">Edit User</button>
+            </div>
+        </form>
+        <div class="form_group">
+            <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
+        </div>
+    </div>
 </body>
 
 </html>
 
+<script src="../js/dynamicCountryState.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const countrySelect = document.getElementById('country');
-        const stateSelect = document.getElementById('state');
-        const selectedCountry = '<?= $_POST['country'] ?? '' ?>';
-        const selectedState = '<?= $_POST['state'] ?? '' ?>';
-        fetch('http://localhost/php/views/crud/editUser2.php?action=getCountries')
-            .then(response => response.json())
-            .then(countries => {
-                countries.forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = country.id;
-                    option.textContent = country.name;
-
-                    if (country.id === selectedCountry) {
-                        option.selected = true;
-                    }
-                    countrySelect.appendChild(option);
-                });
-                if (selectedCountry) {
-                    fetchStates(selectedCountry, selectedState);
-                }
-            })
-            .catch(error => console.error('Error fetching countries:', error));
-
-        countrySelect.addEventListener('change', function() {
-            const countryId = this.value;
-            stateSelect.innerHTML = '<option value="">Select State</option>';
-
-            if (countryId) {
-                fetchStates(countryId);
-            }
-        });
-
-        function fetchStates(countryId, preselectedState = '') {
-            fetch(`http://localhost/php/views/crud/editUser2.php?action=getStates&country_id=${countryId}`)
-                .then(response => response.json())
-                .then(states => {
-                    states.forEach(state => {
-                        const option = document.createElement('option');
-                        option.value = state.id;
-                        option.textContent = state.name;
-                        if (state.id === preselectedState) {
-                            option.selected = true;
-                        }
-                        stateSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching states:', error));
-        }
+    document.addEventListener('DOMContentLoaded' , function(){
+        countryStateDropdowns('country' , 'state' , '<?= $_POST['country'] ?? '' ?>' , '<?= $_POST['state'] ?? '' ?>')
     });
-</script>
+</script> 
+
+

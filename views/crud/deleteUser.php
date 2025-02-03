@@ -1,5 +1,5 @@
 <?php
-include './dataBaseConnect.php';
+include '../../config/dataBaseConnect.php';
 
 // delete user 
     $id = $_GET["id"];    

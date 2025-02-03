@@ -9,7 +9,7 @@
 
 function validateForm($data)
 {
-    echo $data['country'] ;
+    // echo $data['country'] ;
     // print_r($data);
     // die();  
     $errors = [];

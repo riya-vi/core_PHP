@@ -1,56 +1,44 @@
 <?php
-include '../config/dataBaseConnect.php';
+include   '../config/dataBaseConnect.php';
 
-require_once(__DIR__ . '/vendor/autoload.php');
+require '../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-// require '/usr/share/phpmail/Exception.php';
-// require 'mail/PHPMailer.php';
-// require 'mail/SMTP.php';
-
-// require_once __DIR__ . '/vendor/phpmailer/src/Exception.php';
-// require_once __DIR__ . '/vendor/phpmailer/src/PHPMailer.php';
-// require_once __DIR__ . '/vendor/phpmailer/src/SMTP.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $toEmail = $_POST['email'];
 
     $sql = "SELECT id FROM users WHERE email = '$toEmail'";
-    // echo $sql ;
     $result = $connection->query($sql);
 
     if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $id = $row['id'];
-
-        echo "email exist";
 
         $mail = new PHPMailer(true);
 
         try {
-            // $mail->SMTPDebug = 2;
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
             $mail->isSMTP();
-            $mail->Host = 'mail.devvivanshinfotech.com';
-            $mail->SMTPAuth = true;
+            $mail->Host = 'mail.devvivanshinfotech.com' ;
             $mail->Username = 'mail@devvivanshinfotech.com';
             $mail->Password = 'password';
             $mail->SMTPSecure = 'ssl';
             $mail->Port  = '465';
 
             $mail->setFrom('mail@devvivanshinfotech.com');
-            $mail->addAddress($email);
-            // $mail->addAddress('');
+            $mail->addAddress($toEmail);
 
             $mail->isHTML(true);
             $mail->Subject = 'Reset Password';
-            $mail->Body = 'To Reset your Password click <a href=""> here </a>';
-            // $mail->AltBody = '';
+
+            $url = "http://localhost/php/views/resetPassword.php?email=$toEmail" ;
+            
+            $mail->Body = "<h3>To Reset Your Password </h3> Click <a href='$url'>this link</a> ";
+
             $mail->send();
+
             echo "Mail has been sent Successfully!";
         } catch (Exception $e) {
             echo "Error sending email: " . $mail->ErrorInfo;
@@ -63,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <div class="container">
-        <h1>Forgot  Password </h1>
+        <h1>Forgot Password </h1>
         <form action="./forgotPassword.php" method="POST">
             <div class="form_group">
                 <p>Enter your Email and we will send you reset Password link</p>
@@ -81,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="email">Email :</label>
                 <input type="text" id="email" name="email" required>
             </div>
-        
+
             <div class="form_group">
                 <button type="submit">Send Reset Link</button>
             </div>

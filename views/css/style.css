@@ -43,7 +43,7 @@ h1 {
 
 .form_group button {
     display: block;
-    width: 100%;
+    /* width: 100%; */
     padding: 10px;
     background-color: #3874cf;
     color: white;
@@ -66,3 +66,5 @@ h1 {
     margin-top: 5px;
 }
 
+
+   
