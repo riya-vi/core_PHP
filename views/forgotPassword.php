@@ -15,13 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $connection->query($sql);
 
     if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc() ;
+        $userId = $user['id'] ; 
+
+        $resetToken = bin2hex(random_bytes(50));
+        $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+
+        $insertTokenQuery = "INSERT INTO password_reset_tokens (`user_id` , `token`, `expiry`) VALUES ('$userId', '$resetToken', '$expiry')" ;
+
+        $insertTokenQueryResult = $connection->query($insertTokenQuery);
 
         $mail = new PHPMailer(true);
 
         try {
             // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
             $mail->isSMTP();
-            $mail->Host = 'mail.devvivanshinfotech.com' ;
+            $mail->Host = 'mail.devvivanshinfotech.com';
             $mail->Username = 'mail@devvivanshinfotech.com';
             $mail->Password = 'password';
             $mail->SMTPSecure = 'ssl';
@@ -33,19 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->isHTML(true);
             $mail->Subject = 'Reset Password';
 
-            $url = "http://localhost/php/views/resetPassword.php?email=$toEmail" ;
-            
-            $mail->Body = "<h3>To Reset Your Password </h3> Click <a href='$url'>this link</a> ";
+            $resetLink = "http://localhost/php/views/resetPassword.php?token=" . $resetToken;
+
+            $mail->Body = "<h3>To Reset Your Password </h3> Click <a href='$resetLink'>this link</a> ";
 
             $mail->send();
 
-            echo "Mail has been sent Successfully!";
+          $mailSentMessage = "Mail has been sent Successfully , Please Check Your Email !";
         } catch (Exception $e) {
             echo "Error sending email: " . $mail->ErrorInfo;
             throw new Exception($mail->ErrorInfo);
         }
     } else {
-        echo '<script>alert("email does not exist!")</script>';
+        $emailErr = "email does not exist";
     }
 }
 ?>
@@ -69,6 +78,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form_group">
                 <label for="email">Email :</label>
                 <input type="text" id="email" name="email" required>
+            </div>
+
+            <div class="form_group">
+                <span class="error"><?php echo $emailErr ?></span>
+            </div>
+
+            <div class="form_group">
+                <span class="success"><?php echo $mailSentMessage ?></span>
             </div>
 
             <div class="form_group">

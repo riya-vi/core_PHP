@@ -84,7 +84,6 @@ $stateFilter = $listUserData['stateFilter'];
             </select>
 
             <div class="col-md-3">
-                <!-- Submit button for search and filters -->
                 <button type="submit" class="btn btn-primary">Apply</button>
                 <a href="dashboard.php" class="btn btn-secondary">Reset</a>
             </div>

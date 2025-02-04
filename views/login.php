@@ -28,14 +28,12 @@ function test_input($data)
 
 session_start();
 
-// verify user from database
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if ($emailErr == "" && $passwordErr == "" && !empty($_POST["email"]) && !empty($_POST["password"])) {
 
-    // Database User Verification 
     $email = $_POST['email'];
     $password = $_POST['password'];
-    // $loginErr = '' ;
+    $loginErr = '' ;
 
     $sql = "SELECT * FROM users WHERE email = '$email'";
     $result = $connection->query($sql);
@@ -78,11 +76,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-
+  <?php
+  if (isset($_REQUEST['success']) == 'resetPassword') {
+    echo "<div class='alert alert-success'>Password Updated Successfully !</div>";
+  }
+  ?>
   <div class="container">
     <h1> Login form</h1>
-
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+
       <div class="form_group">
         <label for="email">Email :</label>
         <input type="text" id="email" name="email" value="<?= (isset($_POST['email'])) ? strip_tags($_POST['email']) : '' ?>">
@@ -113,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </form>
   </div>
-  
+
 </body>
 
 </html>

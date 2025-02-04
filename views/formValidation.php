@@ -5,7 +5,7 @@
  *
  * @param  post data entered by user in forms
  * @return errors  
- */
+*/
 
 function validateForm($data)
 {

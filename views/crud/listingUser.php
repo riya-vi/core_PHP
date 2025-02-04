@@ -18,7 +18,7 @@ function listUser($connection)
 
     $searchResult = isset($_GET['search']) ? $_GET['search'] : '';
     $sortColumn = isset($_GET['sortColumn']) ? $_GET['sortColumn'] : 'id';
-    $sortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'DESC' ? 'DESC' : 'ASC';
+    $sortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'ASC' ? 'ASC' : 'DESC';
 
     $allowedColumns = ['id', 'first_name', 'last_name', 'email'];
     $sortColumn = in_array($sortColumn, $allowedColumns) ? $sortColumn : 'id';
