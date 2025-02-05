@@ -1,15 +1,27 @@
 <?php
-include '../config/dataBaseConnect.php';
-// include './crud/userListing.php';
-include './crud/listingUser.php';
-
-
 session_start();
+
+include '../config/dataBaseConnect.php';
+include './crud/listingUser2.php';
+require '../roles/checkPermission.php';
+
+// echo "hello Dashboard <br>";
+
+
+
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
     echo "<script> alert('Please login first') </script>";
     header("Location: login.php");
-    exit;
+    // exit;
 }
+
+if (hasPermission('edit-user')) {
+    echo "<a href='./crud/editUser2.php'>Edit Your Profie</a><br>";
+    // header("Location: dashboard.php") ;
+}
+
+
+
 
 $listUserData = listUser($connection);
 $result = $listUserData['result'];
@@ -52,15 +64,19 @@ $stateFilter = $listUserData['stateFilter'];
         }
         ?>
     </div>
-<br>
-
-    <a href="./crud/addUser.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>
-
+    <br>
+<?php
+if(hasPermission('add_user')){
+    echo '<a href="./crud/addUser.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>' ;
+}
+?>
+    
+    
     <!-- search and filter  -->
     <form method="GET" id="search-filter-form">
         <div class="row">
             <input type="text" id="search-box" name="search" placeholder="Search users..." value="<?= htmlspecialchars($searchResult) ?>" />
-           <br>
+            <br>
             <select name="countryFilter">
                 <option value="">Filter by Country</option>
                 <?php
@@ -156,8 +172,19 @@ $stateFilter = $listUserData['stateFilter'];
                             <td><?= $rows['pincode'] ?></td>
                             <td><?= $rows['file_path'] ?></td>
                             <td>
-                                <a href="./crud/editUser2.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
-                                <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
+                                <?php if (hasPermission('edit_user')) {
+                                ?>
+                                    <a href="./crud/editUser2.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
+                                <?php } else {
+                                    echo "";
+                                } ?>
+
+                                <?php if (hasPermission('delete_user')) {
+                                ?>
+                                    <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
+                                <?php  } else {
+                                    echo "";
+                                } ?>
                             </td>
                         </tr>
                 <?php

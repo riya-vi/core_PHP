@@ -1,6 +1,9 @@
 <?php
+
+
 include '../../config/dataBaseConnect.php';
 include '../formValidation.php';
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -22,14 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
         $uploadDir = realpath(__DIR__ . '/../../storage/profile_images/') . '/';
-        // echo $uploadDir . "<br>";
-        // die;
+        
         $defaultPhoto = '/storage/default.jpg';
         $filePath = $_POST['existingFilePath'] ?? $defaultPhoto;
 
-        // echo "existin/g file to be deleted . <br>" ;
-        // echo $_POST['existingFilePath'];
-        // die;
 
         if ($_FILES['profilePhoto']['error'] == 0) {
             $fileName = uniqid() . basename($_FILES['profilePhoto']['name']);
@@ -164,14 +163,15 @@ $rows = $result->fetch_assoc();
             <div class="form_group">
                 <label for="country">Country :</label>
                 <select name="country" id="country">
-                    <option value="">Select Country</option>
+                   
                     <?php
-                    $countries = $connection->query("SELECT id, name FROM countries");
+                    $countries = $connection->query("SELECT id, name FROM countries where id =  {$rows['country_id']} ");
                     while ($country = $countries->fetch_assoc()) {
-                        $selected = $rows['country_id'] == $country['id'] ? 'selected' : '';
+                        $selected = $rows['country_id'] == $country['id'] ? 'selected' : '' ;
                         echo "<option value='{$country['id']}' $selected>{$country['name']}</option>";
                     }
                     ?>
+   
                 </select>
                 <span class="error">
                     <?php echo $errors['country'] ?? ''; ?>
@@ -219,7 +219,7 @@ $rows = $result->fetch_assoc();
                 <button type="submit" name="submit">Edit User</button>
             </div>
         </form>
-        
+
         <div class="form_group">
             <button type="submit" name="cancel"><a href="../dashboard.php" style="color: white;">Cancel</a></button>
         </div>

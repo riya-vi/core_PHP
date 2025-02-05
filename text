@@ -1,0 +1,233 @@
+
+<?php 
+// Include the necessary files
+include '../config/dataBaseConnect.php'; 
+require_once './formValidation.php'; 
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <h1> Registration form</h1>
+    <!-- Registration form starts -->
+    <form method="post" action="../backend/registration_handler.php">
+
+      <div class="form_group">
+        <label for="firstName">First name:</label>
+        <input type="text" id="firstName" name="firstName"
+          value="<?= isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : '' ?>"> 
+        <span class="error"><?php echo $errors['firstName'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="lastName">Last name:</label>
+        <input type="text" id="lastName" name="lastName"
+          value="<?= isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : '' ?>"> 
+        <span class="error"><?php echo $errors['lastName'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="email">Email :</label>
+        <input type="text" id="email" name="email"
+          value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>">
+        <span class="error"><?php echo $errors['email'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="phone">Phone No. :</label>
+        <input type="text" id="phone" name="phone"
+          value="<?= isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '' ?>"> 
+        <span class="error"><?php echo $errors['phone'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="address">Address :</label>
+        <textarea name="address" id="address"><?= isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '' ?></textarea>
+        <span class="error"><?php echo $errors['address'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="country">Country :</label>
+        <select name="country" id="country">
+          <option value="">Select Country</option>
+        </select>
+        <span class="error"><?php echo $errors['country'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="state">State :</label>
+        <select name="state" id="state">
+          <option value="">Select State</option>
+        </select>
+        <span class="error"><?php echo $errors['state'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="pincode">Pincode :</label>
+        <input type="text" name="pincode" id="pincode"
+          value="<?= isset($_POST['pincode']) ? htmlspecialchars($_POST['pincode']) : '' ?>"> 
+        <span class="error"><?php echo $errors['pincode'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="password">Password :</label>
+        <input type="password" id="password" name="password"
+          value="<?= isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '' ?>"> 
+        <span class="error"><?php echo $errors['password'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <label for="confirmPass">Confirm Password :</label>
+        <input type="password" id="confirmPass" name="confirmPass"
+          value="<?= isset($_POST['confirmPass']) ? htmlspecialchars($_POST['confirmPass']) : '' ?>"> 
+        <span class="error"><?php echo $errors['confirmPass'] ?? ''; ?></span>
+      </div>
+
+      <div class="form_group">
+        <button type="submit">Register</button>
+      </div>
+
+      <div class="form_group">
+        <p>Already have an account? <a href="./login.php"><span>Login</span></a></p>
+      </div>
+    </form>
+  </div>
+  <script src="./js/dynamicCountryState.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      countryStateDropdowns('country', 'state', '<?= $_POST['country'] ?? '' ?>', '<?= $_POST['state'] ?? '' ?>')
+    });
+  </script>
+</body>
+
+</html>
+
+
+<?php
+include '../config/dataBaseConnect.php';
+require_once './formValidation.php';
+
+// Initialize an empty array for errors
+$errors = [];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate the form data
+    $errors = validateForm($_POST);
+
+    if (empty($errors)) {
+        // Assigning form data to variables
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
+        $email = $_POST['email'];
+        $phoneNo = $_POST['phone'];
+        $address = trim($_POST['address']);
+        $country = $_POST['country'];
+        $state = $_POST['state'];
+        $pincode = $_POST['pincode'];
+        $password = $_POST['password'];
+
+        $options = ["cost" => 10];
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
+
+        // Prepare SQL query
+        $sql = "INSERT INTO users (first_name, last_name, email, phone_no, address, country_id, state_id, pincode, password) 
+                VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country', '$state', '$pincode', '$hashedPassword')";
+
+        if ($connection->query($sql)) {
+            header("Location: login.php");
+            exit;
+        } else {
+            echo "Error inserting data: " . $connection->error;
+        }
+    }
+}
+?>
+
+
+<div class="form_group">
+    <label for="country">Country :</label>
+    <select name="country" id="country">
+        <option value="">Select Country</option>
+        <?php
+        // Fetch countries from the database
+        $countries = $connection->query("SELECT id, name FROM countries");
+        while ($country = $countries->fetch_assoc()) {
+            $selected = $rows['country_id'] == $country['id'] ? 'selected' : '';
+            echo "<option value='{$country['id']}' $selected>{$country['name']}</option>";
+        }
+        ?>
+    </select>
+    <span class="error"><?php echo $errors['country'] ?? ''; ?></span>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('country');
+    const stateSelect = document.getElementById('state');
+
+    function fetchStates(countryId, preselectedState = '') {
+        fetch(`fetchStates.php?country_id=${countryId}`)
+            .then(response => response.json())
+            .then(states => {
+                stateSelect.innerHTML = '<option value="">Select State</option>';
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+                    if (state.id === preselectedState) {
+                        option.selected = true;
+                    }
+                    stateSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching states:', error));
+    }
+
+    countrySelect.addEventListener('change', function() {
+        const countryId = this.value;
+        stateSelect.innerHTML = '<option value="">Select State</option>';
+        if (countryId) {
+            fetchStates(countryId);
+        }
+    });
+
+    <?php if (isset($rows['country_id'])): ?>
+        fetchStates(<?php echo $rows['country_id']; ?>, <?php echo $rows['state_id']; ?>);
+    <?php endif; ?>
+});
+</script>
+```
+
+<?php
+include 'dataBaseConnect.php';
+
+if (isset($_GET['country_id'])) {
+    $countryId = $_GET['country_id'];
+
+    $query = "SELECT id, name FROM states WHERE country_id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("i", $countryId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $states = [];
+    while ($row = $result->fetch_assoc()) {
+        $states[] = $row;
+    }
+
+    echo json_encode($states);
+}
+?>
+

@@ -1,6 +1,6 @@
 <?php
 
-// echo "form validation" ;
+echo "form validation" ;
 /**
  * Handles the logic for validation error in user input data
  *
@@ -57,17 +57,17 @@ function validateForm($data)
         $address = test_input($data['address']);
     }
 
-    // if (empty($data['country'])) {
-    //     $errors['country'] = "Country is required";
-    // } else {
-    //     $country = test_input($data['country']);
-    // }
+    if (empty($data['country'])) {
+        $errors['country'] = "Country is required";
+    } else {
+        $country = test_input($data['country']);
+    }
 
-    // if (empty($data['state'])) {
-    //     $errors['state'] = "state is required";
-    // } else {
-    //     $state = test_input($data['state']);
-    // }
+    if (empty($data['state'])) {
+        $errors['state'] = "state is required";
+    } else {
+        $state = test_input($data['state']);
+    }
 
     if (empty($data['pincode'])) {
         $errors['pincode'] = "Pincode is required";

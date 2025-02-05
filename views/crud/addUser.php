@@ -1,6 +1,16 @@
 <?php
+
 include '../../config/dataBaseConnect.php';
 include '../formValidation.php';
+include '../../roles/checkPermission.php';
+
+
+// if (hasPermission('add_user')) {
+//     echo "<a href='addUser.php'>Add User</a><br>";
+// } else {
+//     echo "";
+// }
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -49,15 +59,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Add User</title>
-
 </head>
 
 <body>
-
     <?php
     include '../layout/navbar.php';
     ?>
-
     <div class="container">
         <h1>Enter User Details</h1>
 
@@ -169,8 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <script src="../js/dynamicCountryState.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded' , function(){
-        countryStateDropdowns('country' , 'state' , '<?= $_POST['country'] ?? '' ?>' , '<?= $_POST['state'] ?? '' ?>')
+    document.addEventListener('DOMContentLoaded', function() {
+        countryStateDropdowns('country', 'state', '<?= $_POST['country'] ?? '' ?>', '<?= $_POST['state'] ?? '' ?>')
     });
 </script>
-

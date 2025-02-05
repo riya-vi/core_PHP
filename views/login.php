@@ -43,6 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $row['password'])) {
           $_SESSION['email'] = $email;
           $_SESSION['password'] = $password;
+          $_SESSION['user_id'] = $row['id'];
+          $_SESSION['role_id'] = $row['role_id'] ;
+          // echo $_SESSION['user_id'] ;
+          // echo $_SESSION['role_id'] ;
+          // die ;
           echo '<script>alert("Logged in Successfully")</script>';
           header("Location: dashboard.php");
           exit();

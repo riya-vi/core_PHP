@@ -3,32 +3,53 @@ include '../config/dataBaseConnect.php';
 
 /**
  * Generates the SQL query for the search condition.
- * @param  $search The search string input by the user. and   $connection The database connection object.
- * @return string The SQL WHERE clause for the search.
+ * @param  $search The search  input by the user.
+ * @param  $connection The database connection object.
+ * @return SQL WHERE clause for the search.
  */
 function getSearchQuery($search, $connection) {
     return !empty($search) ? " AND CONCAT(first_name, ' ', last_name, email) LIKE '%" . $connection->real_escape_string($search) . "%'" : '';
 }
 
-// generates the SQL query for filtering user data based on selected country
+/**
+ * Generates the SQL query for a filter condition based country and state
+ * @param $filter The filter value (e.g., country or state).
+ * @param $column The column to filter by (e.g., country name or state name).
+ * @param $connection The database connection object.
+ * @return SQL WHERE clause for the filter.
+ */
 function getFilterQuery($filter, $column, $connection) {
     return !empty($filter) ? " AND $column LIKE '" . $connection->real_escape_string($filter) . "'" : '';
 }
 
-
+/**
+ * Generates the SQL query for sorting the results.
+ * @param  $sortColumn The column to sort by.
+ * @param  $sortOrder The order to sort (ASC or DESC).
+ * @return  The SQL ORDER BY clause for sorting.
+ */
 function getSortQuery($sortColumn, $sortOrder) {
     $allowedColumns = ['id', 'first_name', 'last_name', 'email'];
     $sortColumn = in_array($sortColumn, $allowedColumns) ? $sortColumn : 'id';
     return " ORDER BY $sortColumn $sortOrder";
 }
 
-
+/**
+ * Generates the SQL query for pagination (LIMIT clause).
+ * @param  $page The current page number.
+ * @param  $recordsPerPage The number of records per page.
+ * @return SQL LIMIT clause for pagination.
+ */
 function getPaginationQuery($page, $recordsPerPage) {
     $startFrom = ($page - 1) * $recordsPerPage;
     return " LIMIT $startFrom, $recordsPerPage";
 }
 
-
+/**
+ * Lists users with filters, search, pagination, and sorting.
+ * @param  $connection The database connection object.
+ * @return array An array containing user results, pagination, and filter values.
+ */
 function listUser($connection) {
     $recordsPerPage = 5;
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -36,7 +57,7 @@ function listUser($connection) {
     $countryFilter = isset($_GET['countryFilter']) ? $_GET['countryFilter'] : '';
     $stateFilter = isset($_GET['stateFilter']) ? $_GET['stateFilter'] : '';
     $sortColumn = isset($_GET['sortColumn']) ? $_GET['sortColumn'] : 'id';
-    $sortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'DESC' ? 'DESC' : 'ASC';
+    $sortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'ASC' ? 'ASC' : 'DESC';
 
     $whereClause = "1=1" . 
         getSearchQuery($search, $connection) . 
