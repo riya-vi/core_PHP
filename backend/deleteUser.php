@@ -1,9 +1,10 @@
 <?php
-include '../../config/dataBaseConnect.php';
+include '../config/dataBaseConnect.php';
+require  '../common/sqlQueries.php' ;
 
 // delete user 
     $id = $_GET["id"];    
-    $sql = "DELETE FROM `users` WHERE `id` = '$id'";
+    $sql = deleteUserQuery($id) ;
     echo $sql;
     echo $id ;
     echo "here2" ;
@@ -12,7 +13,7 @@ include '../../config/dataBaseConnect.php';
         echo 'here 3' ;
         session_start();
         $_SESSION["delete_message"]="Record deleted Successfully !";
-        header("Location: ../dashboard.php");
+        header("Location: ../frontend/dashboard.php");
     } else {
         echo "Something went wrong. Please try again later.";
         echo "Error:" . $sql . "<br>" . $connection->error;

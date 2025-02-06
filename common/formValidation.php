@@ -1,6 +1,6 @@
 <?php
 
-echo "form validation" ;
+// echo "form validation" ;
 /**
  * Handles the logic for validation error in user input data
  *

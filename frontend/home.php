@@ -9,9 +9,9 @@
 <body>
     <h1>Home page 1123</h1>
     
-    <a href="./login.php">Login</a>
-    <a href="./registration.php">Registration</a>
-    <a href="./dashboard.php">Dashboard</a>
+    <a href="../frontend/loginForm.php">Login</a>
+    <a href="../frontend/registrationForm.php">Registration</a>
+    <a href="../frontend/dashboard.php">Dashboard</a>
 
 </body>
 </html>

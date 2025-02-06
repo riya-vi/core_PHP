@@ -1,6 +1,6 @@
 <?php
 
-echo "hello get country state" ;
+// echo "hello get country state" ;
 
 include '../config/dataBaseConnect.php' ;
 

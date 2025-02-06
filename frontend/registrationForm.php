@@ -1,10 +1,3 @@
-<?php
-include '../config/dataBaseConnect.php';
-require_once '../common/formValidation.php';
-
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +5,7 @@ require_once '../common/formValidation.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
@@ -67,13 +60,13 @@ require_once '../common/formValidation.php';
                 </span>
             </div>
 
-            <div class="form_group">
+             <div class="form_group">
                 <label for="country">Country :</label>
                 <select name="country" id="country" value="">
                     <option value="">Select Country</option>
                 </select>
                 <span class="error">
-                    <?php echo $errors['country'] ?? ''; ?>
+                <?php echo $errors['country'] ?? ''; ?>
                 </span>
             </div>
 
@@ -83,7 +76,7 @@ require_once '../common/formValidation.php';
                     <option value="">Select State</option>
                 </select>
                 <span class="error">
-                    <?php echo $errors['state'] ?? ''; ?>
+                <?php echo $errors['state'] ?? ''; ?>
                 </span>
             </div>
 
@@ -94,6 +87,8 @@ require_once '../common/formValidation.php';
                     <?php echo $errors['pincode'] ?? ''; ?>
                 </span>
             </div>
+
+
 
             <div class="form_group">
                 <label for="password">Password :</label>
@@ -118,7 +113,7 @@ require_once '../common/formValidation.php';
             </div>
 
             <div class="form_group">
-                <p>already have an account ? <a href="./login.php"><span>Login</span></a></p>
+                <p>already have an account ? <a href="../frontend/loginForm.php"><span>Login</span></a></p>
             </div>
         </form>
     </div>
@@ -126,7 +121,7 @@ require_once '../common/formValidation.php';
 
 </html>
 
-<script src="./js/dynamicCountryState.js"></script>
+<script src="../js/dynamicCountryState.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         countryStateDropdowns('country', 'state', '<?= $_POST['country'] ?? '' ?>', '<?= $_POST['state'] ?? '' ?>')

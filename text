@@ -154,7 +154,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
 <div class="form_group">
     <label for="country">Country :</label>
     <select name="country" id="country">
@@ -170,7 +169,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </select>
     <span class="error"><?php echo $errors['country'] ?? ''; ?></span>
 </div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -230,4 +228,3 @@ if (isset($_GET['country_id'])) {
     echo json_encode($states);
 }
 ?>
-

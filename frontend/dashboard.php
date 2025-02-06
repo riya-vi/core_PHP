@@ -2,26 +2,13 @@
 session_start();
 
 include '../config/dataBaseConnect.php';
-include './crud/listingUser2.php';
+include '../backend/listingUser.php';
 require '../roles/checkPermission.php';
-
-// echo "hello Dashboard <br>";
-
 
 
 if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
-    echo "<script> alert('Please login first') </script>";
-    header("Location: login.php");
-    // exit;
+    header("Location: ../frontend/loginForm.php?accessMsg");
 }
-
-if (hasPermission('edit-user')) {
-    echo "<a href='./crud/editUser2.php'>Edit Your Profie</a><br>";
-    // header("Location: dashboard.php") ;
-}
-
-
-
 
 $listUserData = listUser($connection);
 $result = $listUserData['result'];
@@ -43,11 +30,11 @@ $stateFilter = $listUserData['stateFilter'];
     <title>Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/dashboardStyle.css">
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
 </head>
 
 <body>
-    <?php include './layout/navbar.php'; ?>
+    <?php include '../layout/navbar.php'; ?>
 
     <!-- Success Messages -->
     <div>
@@ -65,13 +52,12 @@ $stateFilter = $listUserData['stateFilter'];
         ?>
     </div>
     <br>
-<?php
-if(hasPermission('add_user')){
-    echo '<a href="./crud/addUser.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>' ;
-}
-?>
-    
-    
+    <?php
+    if (hasPermission('add_user')) {
+        echo '<a href="../backend/addUser.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>';
+    }
+    ?>
+
     <!-- search and filter  -->
     <form method="GET" id="search-filter-form">
         <div class="row">
@@ -174,14 +160,14 @@ if(hasPermission('add_user')){
                             <td>
                                 <?php if (hasPermission('edit_user')) {
                                 ?>
-                                    <a href="./crud/editUser2.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
+                                    <a href="../backend/editUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-warning">Edit</button></a>
                                 <?php } else {
                                     echo "";
                                 } ?>
 
                                 <?php if (hasPermission('delete_user')) {
                                 ?>
-                                    <a href="./crud/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
+                                    <a href="../backend/deleteUser.php?id=<?= $rows['id'] ?>"><button type="button" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button></a>
                                 <?php  } else {
                                     echo "";
                                 } ?>
