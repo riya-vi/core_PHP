@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <h1> Registration form</h1>
-        
+
         <form method="post" action="../backend/registration.php">
 
             <div class="form_group">
@@ -51,22 +51,23 @@
 
             <div class="form_group">
                 <label for="address">Address :</label>
-                <textarea name="address" id="address" value=""> <?php if (isset($_POST['address'])) {
-                                                                    echo trim($_POST['address']);
-                                                                } ?>
+                <textarea name="address" id="address" value="">
+                    <?php if (isset($_POST['address'])) {
+                        echo trim($_POST['address']);
+                    } ?>
                 </textarea>
                 <span class="error" onchange="" onclick="">
                     <?php echo $errors['address'] ?? ''; ?>
                 </span>
             </div>
 
-             <div class="form_group">
+            <div class="form_group">
                 <label for="country">Country :</label>
                 <select name="country" id="country" value="">
                     <option value="">Select Country</option>
                 </select>
                 <span class="error">
-                <?php echo $errors['country'] ?? ''; ?>
+                    <?php echo $errors['country'] ?? ''; ?>
                 </span>
             </div>
 
@@ -76,7 +77,7 @@
                     <option value="">Select State</option>
                 </select>
                 <span class="error">
-                <?php echo $errors['state'] ?? ''; ?>
+                    <?php echo $errors['state'] ?? ''; ?>
                 </span>
             </div>
 
@@ -87,8 +88,6 @@
                     <?php echo $errors['pincode'] ?? ''; ?>
                 </span>
             </div>
-
-
 
             <div class="form_group">
                 <label for="password">Password :</label>

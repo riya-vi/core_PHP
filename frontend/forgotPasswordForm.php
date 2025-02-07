@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
+<?php
+include '../common/sessions.php';
+invalidTokenErrForResetPassword();
+?>
+
 <body>
     <div class="container">
         <h1>Forgot Password </h1>
@@ -23,23 +28,14 @@
             <div class="form_group">
                 <span class="error">
                     <?php
-                    session_start();
-                    if (isset($_SESSION['forgotPassEmailErr'])) {
-                        echo "email does not exist";
-                        unset($_SESSION['forgotPassEmailErr']);
-                    }
-                    ?></span>
+                    emailNotExistsOnForgotPasswordPage();
+                    ?>
             </div>
 
             <div class="form_group">
                 <span class="success">
                     <?php
-                    session_start();
-
-                    if (isset($_SESSION['emailSentMessage'])) {
-                        echo "Mail has been sent Successfully , Please Check Your Email !";
-                        unset($_SESSION['emailSentMessage']);
-                    }
+                    mailSentMessage();
                     ?></span>
             </div>
 

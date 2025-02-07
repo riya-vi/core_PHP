@@ -1,14 +1,10 @@
 <?php
-session_start();
-
 include '../config/dataBaseConnect.php';
 include '../backend/listingUser.php';
 require '../roles/checkPermission.php';
+require  '../common/sessions.php';
 
-
-if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
-    header("Location: ../frontend/loginForm.php?accessMsg");
-}
+checkLogin();
 
 $listUserData = listUser($connection);
 $result = $listUserData['result'];
@@ -34,27 +30,15 @@ $stateFilter = $listUserData['stateFilter'];
 </head>
 
 <body>
-    <?php include '../layout/navbar.php'; ?>
+    <?php
+    include '../layout/navbar.php';
+    crudSuccessMessages();
+    ?>
 
-    <!-- Success Messages -->
-    <div>
-        <?php
-        if (isset($_SESSION["edit_message"])) {
-            echo '<div class="alert alert-success">Record Updated Successfully!</div>';
-            unset($_SESSION["edit_message"]);
-        } elseif (isset($_SESSION["delete_message"])) {
-            echo '<div class="alert alert-success">Record Deleted Successfully!</div>';
-            unset($_SESSION["delete_message"]);
-        } elseif (isset($_SESSION["add_message"])) {
-            echo '<div class="alert alert-success">User Added Successfully!</div>';
-            unset($_SESSION["add_message"]);
-        }
-        ?>
-    </div>
     <br>
     <?php
     if (hasPermission('add_user')) {
-        echo '<a href="../backend/addUser.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>';
+        echo '<a href="../frontend/addUserForm.php" style="float: right;"><button class="btn btn-success">+ Add New</button></a>';
     }
     ?>
 
@@ -74,7 +58,7 @@ $stateFilter = $listUserData['stateFilter'];
                 ?>
             </select>
 
-            <select name="stateFilter">
+            <select name="stateFilter" id="state">
                 <option value="">Filter by State</option>
                 <?php
                 $states = $connection->query("SELECT id, name FROM states");
@@ -201,23 +185,22 @@ $stateFilter = $listUserData['stateFilter'];
             ?>
         </div>
     </nav>
-
-    <!-- JavaScript -->
-    <script>
-        const searchBox = document.getElementById("search-box");
-
-        window.addEventListener("load", function() {
-            searchBox.focus();
-            const value = searchBox.value;
-            searchBox.value = "";
-            searchBox.value = value;
-        });
-
-        searchBox.addEventListener("input", function() {
-            document.getElementById("search-filter-form").submit();
-        });
-    </script>
-
 </body>
 
 </html>
+
+<script>
+    const searchBox = document.getElementById("search-box");
+
+    window.addEventListener("load", function() {
+        searchBox.focus();
+        const value = searchBox.value;
+        searchBox.value = "";
+        searchBox.value = value;
+    });
+
+    searchBox.addEventListener("input", function() {
+        document.getElementById("search-filter-form").submit();
+    });
+
+</script>

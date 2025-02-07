@@ -1,5 +1,4 @@
 <?php
-
 include '../config/dataBaseConnect.php';
 include '../common/formValidation.php';
 require  '../common/sqlQueries.php' ;
@@ -55,12 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $sql = updateUserQuery($id ,$firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode,  $filePath) ;
 
-        // if (updateUser($conn, $_SESSION['user_id'], $name, $email, $password)) {
-        //     header("Location: profile.php");
-        //     exit();
-        // }
-
-
         if ($connection->query($sql)) {
             session_start();
             $_SESSION["edit_message"] = "Record Updated Successfully!";
@@ -71,12 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-
 $id = $_GET['id'];
 $query = "SELECT * FROM users WHERE id = $id";
 $result = $connection->query($query);
-$rows = $result->fetch_assoc();
-
+$rows = $result->fetch_assoc(); 
 
 ?>
 

@@ -1,5 +1,6 @@
 <?php
 include '../config/dataBaseConnect.php';
+include '../common/sqlQueries.php';
 session_start();
 
 $newPasswordErr = $confirmNewPasswordErr = "";
@@ -7,34 +8,25 @@ $updateMessage = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resetToken = $_POST['resetToken'];
-    // echo $resetToken . "<br>";
-    // die;
-    // $email = $_POST['email'];
     $newPassword = $_POST['newPassword'];
     $confirmNewPassword = $_POST['confirmNewPassword'];
 
-    $tokenExistQuery = "SELECT user_id, expiry FROM password_reset_tokens WHERE `token` = '$resetToken'";
-
-    // echo $tokenExistQuery ;
-    // die; 
+    $tokenExistQuery = checkTokenExistQueryToResetPass($resetToken);
 
     $result = $connection->query($tokenExistQuery);
 
     if (empty($newPassword)) {
         $newPasswordRequireErr = "Password is required";
         $_SESSION['newPasswordRequireErr'] = $newPasswordRequireErr;
-    } 
-    elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $newPassword)) {
+    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $newPassword)) {
         $newPasswordInvalidErr = "Password must be at least 8 characters, one uppercase letter, one digit, and one special character";
         $_SESSION['newPasswordInvalidErr'] = $newPasswordInvalidErr;
     }
 
-
     if (empty($confirmNewPassword)) {
         $confirmNewPasswordErr = "Please re-enter the password";
         $_SESSION['confirmNewPasswordErr'] = $confirmNewPasswordErr;
-    } 
-    elseif ($confirmNewPassword !== $newPassword) {
+    } elseif ($confirmNewPassword !== $newPassword) {
         $confirmNewPasswordNotMatchErr = "Passwords did not match!";
         $_SESSION['confirmNewPasswordNotMatchErr'] = $confirmNewPasswordNotMatchErr;
     }
@@ -48,25 +40,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (empty($newPasswordRequireErr) && empty($newPasswordInvalidErr) && empty($confirmNewPasswordErr) && empty($confirmNewPasswordNotMatchErr)) {
                 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-                $updatePasswordQuery = "UPDATE users SET password = '$hashedPassword' WHERE id = '$userId'";
+                $updatePasswordQuery = updatePasswordQuery($userId, $hashedPassword);
 
-                $deleteTokenQuery = "DELETE FROM password_reset_tokens WHERE `token` = '$resetToken'";
-
-                $deleteTokenResult = $connection->query($deleteTokenQuery);
+                $deleteTokenQuery = deleteTokenQueryAfterResetPassword($resetToken);
 
                 if ($connection->query($updatePasswordQuery) === TRUE) {
-
-                    header("Location: login.php?success=resetPassword");
+                    $deleteTokenResult = $connection->query($deleteTokenQuery);
+                    if ($deleteTokenResult) {
+                        header("Location: login.php?success=resetPassword");
+                    } else {
+                        echo "Error deleting token: " . $connection->error;
+                    }
                 } else {
                     echo "Error updating password: " . $connection->error;
                 }
-            }
+            } 
         } else {
             echo "the reset link has expired";
             exit;
         }
-    } else {
-        echo "invalid token";
-        // exit;
+    }else {
+        header("Location: ../frontend/forgotPasswordForm.php?error=invalidToken");
     }
 }
+?>
+<?php include '../frontend/resetPasswordForm.php'   ?>

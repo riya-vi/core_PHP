@@ -1,13 +1,17 @@
 <?php
 
-
 /** 
  * generates the SQL query for inserting user into database.
  * @param parameters from post data submitted by user
  * @return sql excution 
 */
-function insertUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword)
+function addUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword)
 {
+    return "INSERT INTO users (first_name, last_name, email, phone_no, address, country_id, state_id, pincode, password) 
+        VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country' , '$state','$pincode', '$hashedPassword')";
+}
+
+function registerUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword){
     return "INSERT INTO users (first_name, last_name, email, phone_no, address, country_id, state_id, pincode, password) 
         VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country' , '$state','$pincode', '$hashedPassword')";
 }
@@ -108,4 +112,25 @@ function countUserQuery($search, $countryFilter, $stateFilter,  $connection)
     LEFT JOIN countries c ON u.country_id = c.id
     LEFT JOIN states s ON u.state_id = s.id
     WHERE $whereClause";
+}
+
+function insertTokenQueryForForgotPass($userId , $resetToken ,$expiry){
+    return "INSERT INTO password_reset_tokens (`user_id` , `token`, `expiry`) VALUES ('$userId', '$resetToken', '$expiry')";
+}
+
+function deleteTokenQueryAfterResetPassword($resetToken){
+   return "DELETE FROM password_reset_tokens WHERE `token` = '$resetToken'";
+}
+
+function updatePasswordQuery($userId , $hashedPassword){
+    return "UPDATE users SET password = '$hashedPassword' WHERE id = '$userId'";
+
+}
+
+function checkTokenExistQueryToResetPass($resetToken){
+    return "SELECT user_id, expiry FROM password_reset_tokens WHERE `token` = '$resetToken'";
+}
+
+function getUserWantsToResetPassword($toEmail){
+    return "SELECT id FROM users WHERE email = '$toEmail'";
 }

@@ -1,7 +1,6 @@
-<?php if (!isset($rows)) {
-    die("No user data found!");
-} ?>
-
+<?php
+include '../layout/navbar.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,10 +15,6 @@
 </head>
 
 <body>
-    <?php
-    include '../layout/navbar.php';
-    ?>
-
     <div class="container">
         <h1>Edit User Details</h1>
 

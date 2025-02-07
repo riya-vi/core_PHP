@@ -11,13 +11,8 @@
 
 <body>
   <?php
-  if (isset($_REQUEST['success']) == 'resetPassword') {
-    echo "<div class='alert alert-success'>Password Updated Successfully !</div>";
-  }
-  if(isset($_REQUEST['accessMsg'])){
-    echo "<div class='alert alert-danger'>Please Do Login First !</div>";
-    
-  }
+  include '../common/sessions.php';
+  passwordUpdateAndLoginFirstMessages() ;
   ?>
   <div class="container">
     <h1> Login form</h1>
@@ -27,44 +22,26 @@
         <label for="email">Email :</label>
         <input type="text" id="email" name="email" value="<?= (isset($_POST['email'])) ? strip_tags($_POST['email']) : '' ?>">
         <span class="error">
-        <?php 
-        // session_start() ;
-        if(isset($_SESSION['emailRequireErr'])){
-          echo "Email is Required" ;
-          unset($_SESSION['emailRequireErr']);
-        }elseif(isset($_SESSION['emailInvalidErr'])){
-          echo "Invalid email format !" ;
-          unset($_SESSION['emailInvalidErr']) ;
-        }else{
-          echo "" ;
-        }
-        ?>
+          <?php
+          emailErrorOnLoginPage();
+          ?>
         </span>
       </div>
 
       <div class="form_group">
         <label for="password">Password :</label>
         <input type="password" id="password" name="password"><span class="error">
-        <?php 
-        if(isset($_SESSION['passwordRequireErr'])){
-          echo "Password is Required" ;
-          unset($_SESSION['passwordRequireErr']); 
-        }
-       ?>
+          <?php
+          passwordRequireErrOnLogin();
+          ?>
         </span>
       </div>
 
       <div class="form_group">
-        <span class="error"> <?php 
-        if(isset($_SESSION['invalidPassworLoginErr'])){
-          echo "invalid password !" ;
-          unset($_SESSION['invalidPassworLoginErr']);
-        }elseif(isset($_SESSION['emailNotExistsLoginErr'])){
-          echo "email does not exist !" ;
-          unset($_SESSION['emailNotExistsLoginErr']) ;
-        }
-      
-        ?></span>
+        <span class="error">
+          <?php
+          emailPasswordVerificationOnLoginPage() ;
+          ?></span>
       </div>
 
       <p><a href="../frontend/forgotPasswordForm.php">forgot password ?</a></p>

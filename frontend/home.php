@@ -7,7 +7,7 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Home page 1123</h1>
+    <h1>Home page </h1>
     
     <a href="../frontend/loginForm.php">Login</a>
     <a href="../frontend/registrationForm.php">Registration</a>

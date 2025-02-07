@@ -1,7 +1,4 @@
 <?php
-
-// echo "hello get country state" ;
-
 include '../config/dataBaseConnect.php' ;
 
 if (isset($_GET['action']) && $_GET['action'] === 'getCountries') {

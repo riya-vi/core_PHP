@@ -2,7 +2,6 @@
 include '../config/dataBaseConnect.php';
 require  '../common/sqlQueries.php' ;
 
-// delete user 
     $id = $_GET["id"];    
     $sql = deleteUserQuery($id) ;
     echo $sql;
@@ -18,8 +17,6 @@ require  '../common/sqlQueries.php' ;
         echo "Something went wrong. Please try again later.";
         echo "Error:" . $sql . "<br>" . $connection->error;
     }
-
-// $connection->close();
 
 ?>
 

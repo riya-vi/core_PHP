@@ -1,16 +1,12 @@
+
 <?php
 
 include '../config/dataBaseConnect.php';
 require_once '../common/formValidation.php';
-
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+require '../common/sqlQueries.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // print_r($_POST);
-    // return;
     $errors = validateForm($_POST);
 
     if (empty($errors)) {
@@ -27,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $options = ["cost" => 10];
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
 
-        $sql = insertUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword) ;
+        $sql = registerUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword) ;
 
         if ($connection->query($sql)) {
             session_start();
@@ -37,11 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "error inserting data .";
             echo "Error: " . $sql . "<br>" . $connection->error;
         }
-    }else{
-        // print_r($errors) ;
     }
 }
 
 ?>
-
-<?php include '../frontend/addUserForm.php' ; ?>
+<?php  include '../frontend/addUserForm.php' ; ?>

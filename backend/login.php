@@ -1,15 +1,9 @@
 <?php
 include '../config/dataBaseConnect.php';
 require '../common/sqlQueries.php';
-// require_once '../common/formValidation.php';
-
-// echo  ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
 
 $emailRequireErr = $emailInvalidErr = $passwordRequireErr  ="";
 $email = $password = "";
-
 
 session_start();
 
@@ -57,9 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $_SESSION['password'] = $password;
           $_SESSION['user_id'] = $row['id'];
           $_SESSION['role_id'] = $row['role_id'] ;
-          // echo $_SESSION['user_id'] ;
-          // echo $_SESSION['role_id'] ;
-          // die ;
           echo '<script>alert("Logged in Successfully")</script>';
           header("Location: ../frontend/dashboard.php");
           exit();
@@ -73,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION['emailNotExistsLoginErr'] = $emailNotExistsLoginErr ;
     }
 
-    // Close connection
     $connection->close();
   } else {
     echo '';
