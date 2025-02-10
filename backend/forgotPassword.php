@@ -27,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['forgotPassEmailErr'] = $forgotPassEmailErr;
     }
 }
+
+include '../frontend/forgotPasswordForm.php'
 ?>
 
-<?php include '../frontend/forgotPasswordForm.php';
+

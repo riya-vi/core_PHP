@@ -1,11 +1,9 @@
 <?php
-session_start();
 
 function checkLogin()
 {
     if (!isset($_SESSION['email']) && !isset($_SESSION['password'])) {
         header("Location: ../frontend/loginForm.php?accessMsg");
-        // exit;
     }
 }
 
@@ -108,8 +106,6 @@ function confirmPasswordErrOnResetPasswordForm()
 function invalidTokenErrForResetPassword()
 {
     if (isset($_REQUEST['error']) == 'invalidToken') {
-        // echo "<div class='alert alert-danger'>Invalid Token !</div>";
         echo '<script>alert("Invalid Token! can not reset password with this link please try again ")</script>';
-
     }
 }

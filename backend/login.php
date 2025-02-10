@@ -69,6 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo '';
   }
 }
+
+
+include '../frontend/loginForm.php' ;
 ?>
 
-<?php   include '../frontend/loginForm.php' ; ?>
+

@@ -2,15 +2,13 @@ function countryStateDropdowns(countrySelectId , stateSelectId , selectedCountry
     const countrySelect = document.getElementById('country');
     const stateSelect = document.getElementById('state');
 
-    fetch('http://localhost/php/common/getCountryState.php?action=getCountries')
+    fetch('../common/getCountryState.php?action=getCountries')
         .then(response => response.json())
         .then(countries => {
             countries.forEach(country => {
                 const option = document.createElement('option');
                 option.value = country.id;
                 option.textContent = country.name;
-
-                // console.log("here")
 
                 if (country.id === selectedCountry) {
                     option.selected = true;
@@ -33,7 +31,7 @@ function countryStateDropdowns(countrySelectId , stateSelectId , selectedCountry
     });
 
     function fetchStates(countryId, preselectedState = '') {
-        fetch(`http://localhost/php/common/getCountryState.php?action=getStates&country_id=${countryId}`)
+        fetch(`../common/getCountryState.php?action=getStates&country_id=${countryId}`)
             .then(response => response.json())
             .then(states => {
                 states.forEach(state => {

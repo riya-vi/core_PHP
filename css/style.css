@@ -32,7 +32,6 @@
     font-size: large;
 }
 
-
 .form_group input,
 .form_group select,
 .form_group textarea {
@@ -44,7 +43,7 @@
 
 .form_group button {
     display: block;
-    /* width: 100%; */
+    width: 100%;
     padding: 10px;
     background-color: #3874cf;
     color: white;
@@ -53,7 +52,7 @@
     font-weight: bold;
     font-size: large;
     text-align: center;
-    float: right;
+    /* float: right; */
     margin-top: 15px;
 
 }
@@ -73,11 +72,3 @@
 }
 
 
-
-.container .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 50%;
-  }
-  

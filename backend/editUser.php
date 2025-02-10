@@ -7,19 +7,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = validateForm($_POST);
 
     if (empty($errors)) {
-        $id = $_POST['id'];
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
-        $email = $_POST['email'];
-        $phoneNo = $_POST['phone'];
-        $address = $_POST['address'];
-        $country = $_POST['country'];
-        $state = $_POST['state'];
-        $pincode = $_POST['pincode'];
-        $password = $_POST['password'];
+        // $id = $_POST['id'];
+        // $firstName = $_POST['firstName'];
+        // $lastName = $_POST['lastName'];
+        // $email = $_POST['email'];
+        // $phoneNo = $_POST['phone'];
+        // $address = $_POST['address'];
+        // $country = $_POST['country'];
+        // $state = $_POST['state'];
+        // $pincode = $_POST['pincode'];
+        // $password = $_POST['password'];
 
         $options = ["cost" => 10];
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
+        $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT, $options);
 
         $uploadDir = realpath(__DIR__ . '/../storage/profile_images/') . '/';
 
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $sql = updateUserQuery($id ,$firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode,  $filePath) ;
+        $sql = updateUserQuery($_POST['id'],  $_POST['firstName'], $_POST['lastName'], $_POST['email'], $_POST['phone'], $_POST['address'], $_POST['country'], $_POST['state'], $_POST['pincode'], $filePath, $hashedPassword) ;
 
         if ($connection->query($sql)) {
             session_start();
@@ -69,6 +69,6 @@ $query = "SELECT * FROM users WHERE id = $id";
 $result = $connection->query($query);
 $rows = $result->fetch_assoc(); 
 
-?>
 
-<?php include '../frontend/editUserForm.php'   ?>
+include '../frontend/editUserForm.php'
+?>

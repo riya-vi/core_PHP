@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-
 <?php
+$pageTitle = 'forgot Password';
+include '../common/htmlHeader.php' ;
 include '../common/sessions.php';
+
+// this function gives error if given token is not verified against database token
 invalidTokenErrForResetPassword();
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
 <body>
     <div class="container">
         <h1>Forgot Password </h1>

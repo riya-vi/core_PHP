@@ -4,6 +4,10 @@ include '../backend/listingUser.php';
 require '../roles/checkPermission.php';
 require  '../common/sessions.php';
 
+/**
+ *  function to check if user is logged in or not
+ *  if logged in then and then allow to access dashboard 
+ * */
 checkLogin();
 
 $listUserData = listUser($connection);
@@ -20,18 +24,15 @@ $stateFilter = $listUserData['stateFilter'];
 <!doctype html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/dashboardStyle.css">
-</head>
+<?php
+$pageTitle  = 'Dashboard';
+include '../common/htmlHeader.php' ;
+?>
 
 <body>
     <?php
     include '../layout/navbar.php';
+    // function to show success messages after crud operations
     crudSuccessMessages();
     ?>
 

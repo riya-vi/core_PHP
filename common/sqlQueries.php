@@ -16,7 +16,7 @@ function registerUserQuery($firstName, $lastName, $email, $phoneNo, $address, $c
         VALUES ('$firstName', '$lastName', '$email', '$phoneNo', '$address', '$country' , '$state','$pincode', '$hashedPassword')";
 }
 
-function updateUserQuery($id, $firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $filePath)
+function updateUserQuery($id, $firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $filePath )
 {
     return "UPDATE users SET first_name = '$firstName', last_name = '$lastName', email = '$email',phone_no = '$phoneNo', address = '$address', country_id = '$country', state_id = '$state', pincode = '$pincode', file_path = '$filePath' WHERE id = '$id'";
 }

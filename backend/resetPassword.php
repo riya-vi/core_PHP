@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $newPassword = $_POST['newPassword'];
     $confirmNewPassword = $_POST['confirmNewPassword'];
 
+    // check if token exist before reseting the password
     $tokenExistQuery = checkTokenExistQueryToResetPass($resetToken);
 
     $result = $connection->query($tokenExistQuery);
@@ -31,17 +32,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['confirmNewPasswordNotMatchErr'] = $confirmNewPasswordNotMatchErr;
     }
 
+
     if ($result->num_rows > 0) {
         $resetRequest = $result->fetch_assoc();
 
+        // set the expiry for token 
         if (strtotime($resetRequest['expiry']) > time()) {
             $userId = $resetRequest['user_id'];
 
             if (empty($newPasswordRequireErr) && empty($newPasswordInvalidErr) && empty($confirmNewPasswordErr) && empty($confirmNewPasswordNotMatchErr)) {
                 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
+                // if token exist and within expiry then update the password
                 $updatePasswordQuery = updatePasswordQuery($userId, $hashedPassword);
 
+                // delete the token after updating user password
                 $deleteTokenQuery = deleteTokenQueryAfterResetPassword($resetToken);
 
                 if ($connection->query($updatePasswordQuery) === TRUE) {
@@ -63,5 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: ../frontend/forgotPasswordForm.php?error=invalidToken");
     }
 }
+
+
+include '../frontend/resetPasswordForm.php'
 ?>
-<?php include '../frontend/resetPasswordForm.php'   ?>

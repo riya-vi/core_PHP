@@ -1,16 +1,10 @@
+<?php
+$pageTitle = 'Add User' ;
+include '../common/htmlHeader.php' ;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/dashboardStyle.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <title>Add User</title>
-</head>
-
 <body>
     <?php
     include '../layout/navbar.php';
@@ -57,7 +51,7 @@
                 <label for="address">Address :</label>
                 <textarea name="address" id="address" value="">
                 <?php if (isset($_POST['address'])) {
-                    echo $_POST['address'];
+                    echo trim($_POST['address']);
                 }
                 ?>
                 </textarea>
@@ -117,7 +111,7 @@
             </div>
         </form>
         <div class="form_group">
-            <a href="../frontend/dashboard.php"><button type="submit" style="float: right;">Cancel</button></a>
+            <a href="../frontend/dashboard.php"><button type="submit" >Cancel</button></a>
         </div>
     </div>
 </body>

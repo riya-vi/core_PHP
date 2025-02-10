@@ -1,4 +1,3 @@
-
 <?php
 
 include '../config/dataBaseConnect.php';
@@ -10,20 +9,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = validateForm($_POST);
 
     if (empty($errors)) {
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
-        $email = $_POST['email'];
-        $phoneNo = $_POST['phone'];
-        $address = $_POST['address'];
-        $country = $_POST['country'];
-        $state = $_POST['state'];
-        $pincode = $_POST['pincode'];
-        $password = $_POST['password'];
 
         $options = ["cost" => 10];
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT, $options);
+        $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT, $options);
 
-        $sql = registerUserQuery($firstName, $lastName, $email, $phoneNo, $address, $country, $state, $pincode, $hashedPassword) ;
+        $sql = registerUserQuery($_POST['firstName'], $_POST['lastName'], $_POST['email'], $_POST['phone'], $_POST['address'], $_POST['country'], $_POST['state'], $_POST['pincode'], $hashedPassword) ;
 
         if ($connection->query($sql)) {
             session_start();
@@ -36,5 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+
+include '../frontend/addUserForm.php' ;
 ?>
-<?php  include '../frontend/addUserForm.php' ; ?>

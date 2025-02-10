@@ -7,7 +7,6 @@ use PHPMailer\PHPMailer\Exception;
 
 $mail = new PHPMailer(true);
 try {
-    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
     $mail->isSMTP();
     $mail->Host = 'mail.devvivanshinfotech.com';
     $mail->Username = 'mail@devvivanshinfotech.com';

@@ -27,7 +27,7 @@ function listUser($connection) {
     $countResult = $connection->query($countSql);
 
     if (!$countResult) {
-        die("Count Query Error: " . $connection->error . " - Query: " . $countSql);
+        die("Count Query Error:" . $connection->error . " - Query: " . $countSql);
     }
 
     $countRow = $countResult->fetch_assoc();

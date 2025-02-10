@@ -1,5 +1,5 @@
 <?php
-
+session_start() ;
 function hasPermission($permissionName)
 {
     include '../config/dataBaseConnect.php';
