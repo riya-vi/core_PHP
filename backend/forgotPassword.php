@@ -1,5 +1,5 @@
 <?php
-include   '../config/dataBaseConnect.php';
+include '../config/dataBaseConnect.php';
 include '../common/sqlQueries.php' ;
 session_start();
 
